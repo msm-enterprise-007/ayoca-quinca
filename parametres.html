@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYOKA QUINCA - Paramètres</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================= VARIABLES & RESET ================= */
+        :root {
+            --bg-sidebar: #0b132b;
+            --bg-body: #f4f7f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #9333ea;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .logo-container { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 15px 10px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px; padding: 10px 15px;
+            color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 4px;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+        .corp { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+
+        /* ================= MAIN LAYOUT ================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .topbar {
+            background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .topbar-title h1 { font-size: 20px; font-weight: 600; }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .search-box {
+            display: flex; align-items: center; background: var(--bg-body); border: 1px solid var(--border-color);
+            padding: 8px 15px; border-radius: 6px; width: 250px; color: var(--text-muted);
+        }
+        .search-box input { border: none; background: transparent; outline: none; margin-left: 10px; width: 100%; font-size: 13px; }
+        
+        .btn { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+        .btn-outline { background: white; border-color: var(--border-color); color: var(--text-main); }
+        .btn-primary { background: var(--primary); color: white; }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .user-info span { display: block; color: var(--text-muted); font-size: 11px; }
+        .notification { position: relative; cursor: pointer; font-size: 18px; margin-right: 15px; color: var(--text-muted); }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* ================= CONTENT AREA ================= */
+        .content-scroll {
+            flex: 1; overflow-y: auto; padding: 20px 30px;
+            display: flex; flex-direction: column;
+        }
+
+        /* Tabs */
+        .nav-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 25px; gap: 25px; overflow-x: auto;}
+        .tab { padding: 10px 0; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap;}
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* Settings Layout Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+            padding-bottom: 30px;
+        }
+
+        .card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;}
+        .card-body { padding: 20px; }
+
+        /* Forms Elements */
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .form-control {
+            padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px;
+            font-size: 12px; color: var(--text-main); outline: none; background: white;
+        }
+        .form-control:focus { border-color: var(--primary); }
+        
+        .company-logo-section { display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--border-color); padding-right: 20px; width: 140px;}
+        .company-logo-box { width: 100px; height: 100px; border: 1px dashed var(--border-color); border-radius: 8px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; color: var(--primary); font-size: 40px; background: #f8fafc; }
+        .company-form-section { flex: 1; display: flex; flex-direction: column; }
+        .logo-text { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 5px;}
+
+        /* Toggles */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; }
+        .toggle-switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0;}
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        /* Lists (Categories, Units, Taxes) */
+        .list-item-simple { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 12px; border-bottom: 1px dashed var(--border-color); }
+        .list-item-simple:last-child { border-bottom: none; }
+        .item-left { display: flex; align-items: center; gap: 10px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .item-count { color: var(--text-muted); font-size: 11px; }
+        
+        .btn-full { width: 100%; justify-content: center; margin-top: 15px; font-size: 12px; }
+
+        /* Specific Cards */
+        .info-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; font-size: 12px;}
+        .info-box p { margin-bottom: 5px; }
+        .info-box strong { color: var(--text-main); }
+        
+        .system-log-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px; }
+        .system-log-label { color: var(--text-muted); }
+        .system-log-val { font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div style="background: white; padding: 5px; border-radius: 8px;"><i class="fa-solid fa-store" style="color: var(--primary); font-size: 24px;"></i></div>
+            <div><h2 style="font-size: 18px; letter-spacing: 1px;">AYOKA</h2><p style="font-size: 10px; color: #cbd5e1; letter-spacing: 2px;">QUINCA</p></div>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+            <a href="produits.html" class="nav-item"><i class="fa-solid fa-box"></i> Produits</a>
+            <a href="stock.html" class="nav-item"><i class="fa-solid fa-layer-group"></i> Stock</a>
+            <a href="ventes.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Ventes</a>
+            <a href="achats.html" class="nav-item"><i class="fa-solid fa-bag-shopping"></i> Achats</a>
+            <a href="inventaire.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+            <a href="fournisseurs.html" class="nav-item"><i class="fa-solid fa-users"></i> Fournisseurs</a>
+            <a href="clients.html" class="nav-item"><i class="fa-solid fa-user"></i> Clients</a>
+            <a href="emplacements.html" class="nav-item"><i class="fa-solid fa-location-dot"></i> Emplacements</a>
+            <a href="historique.html" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+            <a href="rapports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Rapports & Statistiques</a>
+            <a href="utilisateurs.html" class="nav-item"><i class="fa-solid fa-user-shield"></i> Utilisateurs</a>
+            <a href="parametres.html" class="nav-item active"><i class="fa-solid fa-gear"></i> Paramètres</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="corp">
+                <div style="background: var(--primary); padding: 8px; border-radius: 8px;"><i class="fa-solid fa-shield-halved"></i></div>
+                <div><p style="font-weight: 600;">MSM-CORP</p><p style="font-size: 11px; color: #cbd5e1;">Solutions digitales</p></div>
+            </div>
+            <div style="color: #cbd5e1; cursor: pointer;"><i class="fa-solid fa-angles-left"></i> Réduire le menu</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Paramètres</h1>
+                <p>Configurez et personnalisez votre application.</p>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Rechercher un paramètre...">
+                    <span style="font-size: 10px; background: white; padding: 2px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Ctrl + K</span>
+                </div>
+                <button class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Sauvegarder les modifications</button>
+                
+                <div class="notification"><i class="fa-regular fa-bell"></i><span class="badge">7</span></div>
+                <div class="user-profile">
+                    <div style="background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white;"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info"><strong>Admin</strong><span>Administrateur</span></div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 5px; cursor: pointer;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-scroll">
+            
+            <!-- Tabs -->
+            <div class="nav-tabs">
+                <div class="tab active">Entreprise</div>
+                <div class="tab">Produits</div>
+                <div class="tab">Stock</div>
+                <div class="tab">Ventes & Achats</div>
+                <div class="tab">Impression</div>
+                <div class="tab">Notifications</div>
+                <div class="tab">Sauvegardes</div>
+                <div class="tab">Sécurité</div>
+                <div class="tab">Système</div>
+            </div>
+
+            <!-- MAIN GRID (3 Colonnes) -->
+            <div class="settings-grid">
+                
+                <!-- ================= COLONNE 1 ================= -->
+                <div class="col">
+                    <!-- Informations de l'entreprise -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Informations de l'entreprise</h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="display:flex; gap:20px;">
+                                <div class="company-logo-section">
+                                    <div class="company-logo-box"><i class="fa-solid fa-store"></i></div>
+                                    <button class="btn btn-outline" style="font-size:10px; padding:4px 8px; width:100%; justify-content:center;"><i class="fa-solid fa-arrow-up-from-bracket"></i> Changer le logo</button>
+                                    <div class="logo-text">JPG, PNG ou SVG<br>Taille conseillée : 512x512</div>
+                                </div>
+                                <div class="company-form-section">
+                                    <div class="form-row">
+                                        <div class="form-group"><label>Nom de l'entreprise</label><input type="text" class="form-control" value="AYOKA QUINCA"></div>
+                                        <div class="form-group"><label>Raison sociale</label><input type="text" class="form-control" value="AYOKA QUINCA SARL"></div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group"><label>Secteur d'activité</label><input type="text" class="form-control" value="Matériaux de construction"></div>
+                                        <div class="form-group"><label>Identifiant fiscal (NIF)</label><input type="text" class="form-control" value="0123456789A1"></div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group"><label>Téléphone</label><input type="text" class="form-control" value="+229 97 00 01 01"></div>
+                                        <div class="form-group"><label>Email</label><input type="text" class="form-control" value="contact@ayokaquinca.com"></div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group"><label>Adresse</label><input type="text" class="form-control" value="Rue 12.345, Zone industrielle, Cotonou"></div>
+                                        <div class="form-group" style="max-width:100px;"><label>Ville</label><input type="text" class="form-control" value="Cotonou"></div>
+                                        <div class="form-group" style="max-width:100px;"><label>Pays</label><input type="text" class="form-control" value="Bénin"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Catégories de produits -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-box" style="color:var(--warning);"></i> Catégories de produits</h3>
+                        </div>
+                        <div class="card-body" style="padding-top:5px; padding-bottom:5px;">
+                            <p style="font-size:10px; color:var(--text-muted); margin-bottom:10px;">Gérez les catégories principales de vos produits.</p>
+                            <div class="list-item-simple"><div class="item-left"><div class="dot" style="background:#2563eb;"></div>Ciment</div><div class="item-count">12 produits</div></div>
+                            <div class="list-item-simple"><div class="item-left"><div class="dot" style="background:#10b981;"></div>Fer à béton</div><div class="item-count">15 produits</div></div>
+                            <div class="list-item-simple"><div class="item-left"><div class="dot" style="background:#f59e0b;"></div>Carrelage</div><div class="item-count">18 produits</div></div>
+                            <div class="list-item-simple"><div class="item-left"><div class="dot" style="background:#9333ea;"></div>Peintures</div><div class="item-count">9 produits</div></div>
+                            <div class="list-item-simple"><div class="item-left"><div class="dot" style="background:#ef4444;"></div>Plomberie</div><div class="item-count">7 produits</div></div>
+                            <div class="list-item-simple"><div class="item-left"><div class="dot" style="background:#db2777;"></div>Électricité</div><div class="item-count">11 produits</div></div>
+                            <div class="list-item-simple"><div class="item-left"><div class="dot" style="background:#8b5cf6;"></div>Outillage</div><div class="item-count">13 produits</div></div>
+                        </div>
+                        <div style="padding: 0 20px 20px 20px;">
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary);"><i class="fa-solid fa-list"></i> Gérer les catégories</button>
+                        </div>
+                    </div>
+
+                    <!-- Sécurité -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Sécurité</h3>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size:10px; color:var(--text-muted); margin-bottom:15px;">Gérez la sécurité de votre application.</p>
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Expiration de session (minutes)</label>
+                                    <select class="form-control" style="width:80px;"><option>60</option></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Tentatives de connexion autorisées</label>
+                                    <select class="form-control" style="width:80px;"><option>5</option></select>
+                                </div>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Exiger une ré-authentification</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Verrouiller l'application au démarrage</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary); margin-top:10px;"><i class="fa-solid fa-users"></i> Gérer les sessions actives</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= COLONNE 2 ================= -->
+                <div class="col">
+                    <!-- Unités de vente -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-tag" style="color:var(--primary);"></i> Unités de vente</h3>
+                        </div>
+                        <div class="card-body" style="padding-top:5px; padding-bottom:5px;">
+                            <p style="font-size:10px; color:var(--text-muted); margin-bottom:10px;">Gérez les unités utilisées pour vos produits.</p>
+                            <div class="list-item-simple"><div class="item-left">Sac</div><div class="item-count">Unité principale</div></div>
+                            <div class="list-item-simple"><div class="item-left">Pièce</div><div class="item-count">Unité principale</div></div>
+                            <div class="list-item-simple"><div class="item-left">Mètre</div><div class="item-count">Unité principale</div></div>
+                            <div class="list-item-simple"><div class="item-left">Kg</div><div class="item-count">Unité principale</div></div>
+                            <div class="list-item-simple"><div class="item-left">Litre</div><div class="item-count">Unité principale</div></div>
+                            <div class="list-item-simple"><div class="item-left">Boîte</div><div class="item-count">Unité principale</div></div>
+                            <div class="list-item-simple"><div class="item-left">Paquet</div><div class="item-count">Unité principale</div></div>
+                        </div>
+                        <div style="padding: 0 20px 20px 20px;">
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary);"><i class="fa-solid fa-list"></i> Gérer les unités</button>
+                        </div>
+                    </div>
+
+                    <!-- Taxes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-percent" style="color:var(--danger);"></i> Taxes</h3>
+                        </div>
+                        <div class="card-body" style="padding-top:5px; padding-bottom:5px;">
+                            <p style="font-size:10px; color:var(--text-muted); margin-bottom:10px;">Configurez les taxes et taux applicables.</p>
+                            <div class="list-item-simple"><div class="item-left">TVA</div><div class="item-count" style="color:var(--danger); font-weight:600;">18%</div></div>
+                            <div class="list-item-simple"><div class="item-left">TPS</div><div class="item-count">0%</div></div>
+                            <div class="list-item-simple"><div class="item-left">Taxe spécifique</div><div class="item-count">0%</div></div>
+                            <div class="list-item-simple"><div class="item-left">Taxe communale</div><div class="item-count">2%</div></div>
+                        </div>
+                        <div style="padding: 0 20px 20px 20px;">
+                            <button class="btn btn-outline btn-full" style="color:var(--danger); border-color:var(--danger);"><i class="fa-solid fa-percent"></i> Gérer les taxes</button>
+                        </div>
+                    </div>
+
+                    <!-- Journal système -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-file-lines" style="color:var(--warning);"></i> Journal système</h3>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size:10px; color:var(--text-muted); margin-bottom:15px;">Consultez les événements système importants.</p>
+                            <div class="system-log-row"><span class="system-log-label">Dernier événement</span><span class="system-log-val">25/05/2025 à 08:45</span></div>
+                            <div class="system-log-row"><span class="system-log-label">Événements aujourd'hui</span><span class="system-log-val">23</span></div>
+                            <div class="system-log-row"><span class="system-log-label">Avertissements</span><span class="system-log-val">2</span></div>
+                            <div class="system-log-row"><span class="system-log-label">Erreurs</span><span class="system-log-val">0</span></div>
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary); margin-top:10px;"><i class="fa-solid fa-file-lines"></i> Voir le journal système</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= COLONNE 3 ================= -->
+                <div class="col">
+                    <!-- Paramètres des stocks -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-box-open" style="color:var(--primary);"></i> Paramètres des stocks</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label style="font-weight:600; color:var(--text-main);">Stock minimum (alerte)</label>
+                                    <input type="number" class="form-control" style="width:60px; text-align:center;" value="10">
+                                </div>
+                            </div>
+                            <p style="font-size:9px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">Seuil en dessous duquel une alerte est déclenchée.</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label style="font-weight:600; color:var(--text-main);">Stock critique</label>
+                                    <input type="number" class="form-control" style="width:60px; text-align:center;" value="5">
+                                </div>
+                            </div>
+                            <p style="font-size:9px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">Seuil critique nécessitant une attention immédiate.</p>
+
+                            <div class="form-group" style="margin-bottom:15px;">
+                                <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Méthode d'évaluation du stock</label>
+                                <p style="font-size:10px; color:var(--text-muted); margin-bottom:5px;">Choisissez la méthode de valorisation des stocks.</p>
+                                <select class="form-control"><option>Premier entré, premier sorti (FIFO)</option></select>
+                            </div>
+
+                            <div class="toggle-row" style="margin-top:20px;">
+                                <div>
+                                    <div style="font-weight:600; color:var(--text-main);">Autoriser les stocks négatifs</div>
+                                    <div style="font-size:9px; color:var(--text-muted);">Permettre la vente même si le stock est insuffisant.</div>
+                                </div>
+                                <label class="toggle-switch"><input type="checkbox"><span class="slider"></span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paramètres d'impression -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-print" style="color:var(--purple);"></i> Paramètres d'impression</h3>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size:10px; color:var(--text-muted); margin-bottom:15px;">Personnalisez vos impressions.</p>
+                            <div class="form-row">
+                                <div class="form-group"><label>Modèle de facture</label><select class="form-control"><option>Modèle 1</option></select></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Taille du papier</label><select class="form-control"><option>A4 (210 x 297 mm)</option></select></div>
+                            </div>
+                            
+                            <div class="toggle-row" style="margin-top:15px;">
+                                <span>Afficher le logo</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Afficher les prix unitaires</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Afficher les remises</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+
+                            <div class="form-group" style="margin-top:15px;">
+                                <label>Pied de page</label>
+                                <input type="text" class="form-control" value="Merci pour votre confiance !">
+                            </div>
+                            
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary); margin-top:15px;"><i class="fa-solid fa-eye"></i> Aperçu d'une facture</button>
+                        </div>
+                    </div>
+
+                    <!-- Paramètres système -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-gear" style="color:var(--primary);"></i> Paramètres système</h3>
+                        </div>
+                        <div class="card-body" style="padding-top:10px; padding-bottom:10px;">
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Langue de l'application</label>
+                                    <select class="form-control" style="width:120px;"><option>Français</option></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Format de date</label>
+                                    <select class="form-control" style="width:120px;"><option>JJ/MM/AAAA</option></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Format d'heure</label>
+                                    <select class="form-control" style="width:120px;"><option>24 heures</option></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Devise</label>
+                                    <select class="form-control" style="width:120px;"><option>Franc CFA (XOF)</option></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Séparateur décimal</label>
+                                    <select class="form-control" style="width:120px;"><option>,</option></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                                    <label>Séparateur des milliers</label>
+                                    <select class="form-control" style="width:120px;"><option>Espace ( )</option></select>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary); margin-top:15px;"><i class="fa-solid fa-check"></i> Enregistrer les préférences</button>
+                        </div>
+                    </div>
+
+                    <!-- Sauvegardes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-database" style="color:var(--success);"></i> Sauvegardes</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="system-log-row"><span class="system-log-label">Dernière sauvegarde</span><span class="system-log-val">24/05/2025 à 02:15</span></div>
+                            <div class="system-log-row"><span class="system-log-label">Prochaine sauvegarde automatique</span><span class="system-log-val">25/05/2025 à 02:15</span></div>
+                            
+                            <button class="btn btn-outline btn-full" style="color:var(--success); border-color:var(--success); margin-top:15px;"><i class="fa-solid fa-download"></i> Sauvegarder maintenant</button>
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary); margin-top:10px;"><i class="fa-solid fa-upload"></i> Restaurer une sauvegarde</button>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-bell" style="color:var(--purple);"></i> Notifications</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="toggle-row">
+                                <span>Alertes de stock faible</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Alertes de stock critique</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Alertes d'expiration</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Notifications par email</span>
+                                <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                            </div>
+                            
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary); margin-top:10px;"><i class="fa-solid fa-gear"></i> Configurer les notifications</button>
+                        </div>
+                    </div>
+
+                    <!-- À propos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-circle-info" style="color:var(--primary);"></i> À propos</h3>
+                        </div>
+                        <div class="card-body">
+                            <h4 style="font-size:14px; font-weight:700; margin-bottom:5px;">MSM Stock Manager <span style="font-size:10px; font-weight:500; background:#eff6ff; color:var(--primary); padding:2px 6px; border-radius:4px;">Version 1.0.0</span></h4>
+                            <p style="font-size:11px; color:var(--text-muted); margin-bottom:15px; line-height:1.5;">Solution de gestion de stock complète pour les entreprises de matériaux.</p>
+                            
+                            <div style="font-size:11px; margin-bottom:15px;">
+                                <div style="color:var(--text-muted); margin-bottom:3px;">Développé par</div>
+                                <div style="font-weight:600;">MSM-CORP Solutions digitales</div>
+                            </div>
+
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary);"><i class="fa-solid fa-rotate"></i> Voir les mises à jour</button>
+                            <button class="btn btn-outline btn-full" style="color:var(--primary); border-color:var(--primary); margin-top:10px;"><i class="fa-solid fa-file-contract"></i> Conditions d'utilisation</button>
+                            
+                            <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:15px;">© 2025 MSM-CORP. Tous droits réservés.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

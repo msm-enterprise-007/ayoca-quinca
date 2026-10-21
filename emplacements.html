@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYOKA QUINCA - Emplacements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================= VARIABLES & RESET ================= */
+        :root {
+            --bg-sidebar: #0b132b;
+            --bg-body: #f4f7f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #9333ea;
+            --orange: #ea580c;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .logo-container { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 15px 10px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px; padding: 10px 15px;
+            color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 4px;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+        .corp { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+
+        /* ================= MAIN LAYOUT ================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .topbar {
+            background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .topbar-title h1 { font-size: 20px; font-weight: 600; }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .search-box {
+            display: flex; align-items: center; background: var(--bg-body); border: 1px solid var(--border-color);
+            padding: 8px 15px; border-radius: 6px; width: 250px; color: var(--text-muted);
+        }
+        .search-box input { border: none; background: transparent; outline: none; margin-left: 10px; width: 100%; font-size: 13px; }
+        
+        .btn { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+        .btn-outline { background: white; border-color: var(--border-color); color: var(--text-main); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline-primary { background: white; border-color: var(--primary); color: var(--primary); }
+        .btn-outline-danger { background: white; border-color: var(--danger); color: var(--danger); }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .user-info span { display: block; color: var(--text-muted); font-size: 11px; }
+        .notification { position: relative; cursor: pointer; font-size: 18px; margin-right: 15px; color: var(--text-muted); }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* ================= CONTENT AREA ================= */
+        .content-scroll {
+            flex: 1; overflow-y: auto; padding: 25px 30px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+        .kpi-card {
+            background: var(--bg-card); padding: 15px; border-radius: 10px;
+            border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .kpi-info h4 { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 5px; }
+        .kpi-value { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+        .kpi-sub { font-size: 11px; color: var(--text-muted); }
+        .kpi-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; flex-shrink: 0; }
+
+        /* Tabs Top */
+        .top-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
+        .tabs-container { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); width: 100%; padding-bottom: 10px;}
+        .tab { font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; position: relative; padding-bottom: 10px; margin-bottom: -11px; }
+        .tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .btn-plan { background: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; gap: 5px; align-items: center; color: var(--text-main); white-space: nowrap;}
+
+        /* Layout 2 Colonnes */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Sous-layout gauche */
+        .left-column-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 15px;}
+        .card-header { padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+
+        /* Zone List (Left Left) */
+        .zone-list { display: flex; flex-direction: column; padding: 10px; gap: 5px;}
+        .zone-item { display: flex; align-items: center; padding: 12px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; transition: 0.2s; gap: 10px;}
+        .zone-item:hover { background: #f8fafc; }
+        .zone-item.active { background: #eff6ff; border-color: #bfdbfe; }
+        
+        .zone-num { width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); font-size: 10px; font-weight: 600; display: flex; justify-content: center; align-items: center; }
+        .zone-item.active .zone-num { background: var(--primary); color: white; }
+        
+        .zone-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; justify-content: center; align-items: center; color: var(--primary); background: #e0e7ff; }
+        .zone-details { flex: 1; }
+        .zone-title { font-size: 12px; font-weight: 600; margin-bottom: 2px;}
+        .zone-sub { font-size: 10px; color: var(--text-muted); }
+        
+        .zone-stats { text-align: right; }
+        .zone-pct { font-size: 12px; font-weight: 600; }
+        .zone-status { font-size: 9px; color: var(--success); text-transform: uppercase;}
+        .zone-status.occupe { color: var(--success); }
+
+        .mini-progress { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .mini-progress-fill { height: 100%; border-radius: 2px; }
+
+        /* Table Emplacements (Left Right) */
+        .stats-row { display: flex; gap: 30px; padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-val { font-size: 18px; font-weight: 700; }
+        .stat-label { font-size: 11px; color: var(--text-muted); }
+        .stat-progress-container { flex: 1; display: flex; flex-direction: column; justify-content: center;}
+        .stat-progress-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 4px;}
+        .stat-progress-bg { width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; }
+        .stat-progress-fill { height: 100%; background: var(--success); border-radius: 3px;}
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 15px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: #f8fafc;}
+        td { padding: 12px 15px; font-size: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; }
+        
+        .badge-status { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; display: inline-block; }
+        .status-occupe { background: #dcfce7; color: var(--success); }
+        .status-plein { background: #fee2e2; color: var(--danger); }
+        .status-service { background: #e0e7ff; color: var(--primary); }
+
+        /* Bottom Layout */
+        .bottom-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;}
+        
+        .occupancy-list { padding: 15px; display: flex; flex-direction: column; gap: 15px;}
+        .occ-row { display: flex; align-items: center; gap: 15px; font-size: 12px;}
+        .occ-label { width: 120px; }
+        .occ-bar-bg { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; }
+        .occ-bar-fill { height: 100%; border-radius: 3px; }
+        .occ-val { width: 30px; text-align: right; font-weight: 600;}
+
+        .quick-actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; }
+        .action-btn { background: #f8fafc; border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px; cursor: pointer; transition: 0.2s; }
+        .action-btn:hover { border-color: var(--primary); background: #eff6ff; }
+        .action-btn i { font-size: 16px; margin-bottom: 3px; color: var(--text-muted); }
+        .action-btn span { font-size: 11px; font-weight: 500; }
+        .action-btn.full-width { grid-column: span 2; flex-direction: row; justify-content: center; gap: 10px;}
+
+        /* Right Panel */
+        .details-panel { display: flex; flex-direction: column; gap: 15px; }
+        .panel-card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); }
+        
+        .panel-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start;}
+        .panel-header h3 { font-size: 15px; font-weight: 600; }
+        
+        .location-title { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; padding: 0 20px;}
+        .loc-icon { width: 40px; height: 40px; background: #e0e7ff; color: var(--primary); border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+        .loc-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 3px;}
+        .loc-info p { font-size: 11px; color: var(--text-muted); }
+
+        .details-list { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 12px;}
+        .detail-row { display: flex; justify-content: space-between; font-size: 12px; }
+        .detail-label { color: var(--text-muted); }
+        .detail-val { font-weight: 500; text-align: right; }
+        
+        .progress-container { margin-top: 5px; }
+        .progress-bg { width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); border-radius: 3px; width: 80%; }
+
+        .products-list { padding: 20px; border-top: 1px solid var(--border-color); }
+        .product-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .product-header h4 { font-size: 12px; font-weight: 600; }
+        .product-header a { font-size: 11px; color: var(--primary); text-decoration: none; }
+        
+        .product-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 12px; }
+        .product-item-left { display: flex; align-items: center; gap: 10px; }
+        .product-img { width: 24px; height: 24px; background: #e2e8f0; border-radius: 4px; }
+        .product-qty { font-weight: 600; color: var(--text-muted); }
+
+        .panel-footer { padding: 20px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border-color); background: #f8fafc;}
+        .panel-footer .btn { justify-content: center; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div style="background: white; padding: 5px; border-radius: 8px;"><i class="fa-solid fa-store" style="color: var(--primary); font-size: 24px;"></i></div>
+            <div><h2 style="font-size: 18px; letter-spacing: 1px;">AYOKA</h2><p style="font-size: 10px; color: #cbd5e1; letter-spacing: 2px;">QUINCA</p></div>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+            <a href="produits.html" class="nav-item"><i class="fa-solid fa-box"></i> Produits</a>
+            <a href="stock.html" class="nav-item"><i class="fa-solid fa-layer-group"></i> Stock</a>
+            <a href="ventes.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Ventes</a>
+            <a href="achats.html" class="nav-item"><i class="fa-solid fa-bag-shopping"></i> Achats</a>
+            <a href="inventaire.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+            <a href="fournisseurs.html" class="nav-item"><i class="fa-solid fa-users"></i> Fournisseurs</a>
+            <a href="clients.html" class="nav-item"><i class="fa-solid fa-user"></i> Clients</a>
+            <a href="emplacements.html" class="nav-item active"><i class="fa-solid fa-location-dot"></i> Emplacements</a>
+            <a href="historique.html" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+            <a href="rapports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Rapports & Statistiques</a>
+            <a href="utilisateurs.html" class="nav-item"><i class="fa-solid fa-user-shield"></i> Utilisateurs</a>
+            <a href="parametres.html" class="nav-item"><i class="fa-solid fa-gear"></i> Paramètres</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="corp">
+                <div style="background: var(--primary); padding: 8px; border-radius: 8px;"><i class="fa-solid fa-shield-halved"></i></div>
+                <div><p style="font-weight: 600;">MSM-CORP</p><p style="font-size: 11px; color: #cbd5e1;">Solutions digitales</p></div>
+            </div>
+            <div style="color: #cbd5e1; cursor: pointer;"><i class="fa-solid fa-angles-left"></i> Réduire le menu</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Emplacements</h1>
+                <p>Gérez vos zones, étagères et emplacements. Localisez facilement vos produits.</p>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Rechercher un emplacement...">
+                    <span style="font-size: 10px; background: white; padding: 2px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Ctrl + K</span>
+                </div>
+                <button class="btn btn-outline"><i class="fa-solid fa-rotate-right"></i> Actualiser</button>
+                <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Ajouter un emplacement <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                
+                <div class="notification"><i class="fa-regular fa-bell"></i><span class="badge">7</span></div>
+                <div class="user-profile">
+                    <div style="background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white;"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info"><strong>Admin</strong><span>Administrateur</span></div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 5px; cursor: pointer;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-scroll">
+            
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Zones</h4>
+                        <div class="kpi-value text-primary">5</div>
+                        <div class="kpi-sub">Zones définies</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #eff6ff; color: var(--primary);"><i class="fa-solid fa-location-dot"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Emplacements</h4>
+                        <div class="kpi-value text-success">128</div>
+                        <div class="kpi-sub">Emplacements créés</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #ecfdf5; color: var(--success);"><i class="fa-solid fa-layer-group"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Taux d'occupation global</h4>
+                        <div class="kpi-value text-purple">72.4%</div>
+                        <div class="kpi-sub">Occupation moyenne</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #f3e8ff; color: var(--purple);"><i class="fa-solid fa-chart-pie"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Produits stockés</h4>
+                        <div class="kpi-value text-warning">2 845</div>
+                        <div class="kpi-sub">Répartis dans tous les emplacements</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fffbeb; color: var(--warning);"><i class="fa-solid fa-box"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Emplacements disponibles</h4>
+                        <div class="kpi-value text-primary">35</div>
+                        <div class="kpi-sub">27.6% de disponibilité</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #eff6ff; color: var(--primary);"><i class="fa-solid fa-box-open"></i></div>
+                </div>
+            </div>
+
+            <!-- TABS -->
+            <div class="top-tabs">
+                <div class="tabs-container">
+                    <div class="tab active">Vue par zones</div>
+                    <div class="tab">Vue par étagères</div>
+                    <div class="tab">Vue par produits</div>
+                </div>
+                <button class="btn-plan"><i class="fa-solid fa-map"></i> Plan du magasin</button>
+            </div>
+
+            <!-- MAIN LAYOUT -->
+            <div class="main-layout">
+                
+                <!-- COLONNE GAUCHE -->
+                <div class="left-column">
+                    
+                    <div class="left-column-layout">
+                        <!-- LISTE DES ZONES -->
+                        <div class="card" style="margin-bottom:0;">
+                            <div class="card-header"><h3>Liste des zones</h3></div>
+                            <div class="zone-list">
+                                
+                                <!-- Zone 1 (Active) -->
+                                <div class="zone-item active">
+                                    <div class="zone-num">1</div>
+                                    <div class="zone-icon" style="color:var(--primary); background:#e0e7ff;"><i class="fa-solid fa-store"></i></div>
+                                    <div class="zone-details">
+                                        <div class="zone-title">Hall d'entrée</div>
+                                        <div class="zone-sub">Zone de vente - Produits rapides</div>
+                                        <div class="zone-sub">24 emplacements</div>
+                                        <div class="mini-progress"><div class="mini-progress-fill" style="width:81%; background:var(--primary);"></div></div>
+                                    </div>
+                                    <div class="zone-stats">
+                                        <div class="zone-pct">81%</div>
+                                        <div class="zone-status occupe">Occupé</div>
+                                    </div>
+                                </div>
+
+                                <!-- Zone 2 -->
+                                <div class="zone-item">
+                                    <div class="zone-num">2</div>
+                                    <div class="zone-icon" style="color:var(--success); background:#ecfdf5;"><i class="fa-solid fa-warehouse"></i></div>
+                                    <div class="zone-details">
+                                        <div class="zone-title">Magasin de stock</div>
+                                        <div class="zone-sub">Stock général</div>
+                                        <div class="zone-sub">32 emplacements</div>
+                                        <div class="mini-progress"><div class="mini-progress-fill" style="width:75%; background:var(--success);"></div></div>
+                                    </div>
+                                    <div class="zone-stats">
+                                        <div class="zone-pct">75%</div>
+                                        <div class="zone-status occupe">Occupé</div>
+                                    </div>
+                                </div>
+
+                                <!-- Zone 3 -->
+                                <div class="zone-item">
+                                    <div class="zone-num">3</div>
+                                    <div class="zone-icon" style="color:var(--purple); background:#f3e8ff;"><i class="fa-solid fa-boxes-stacked"></i></div>
+                                    <div class="zone-details">
+                                        <div class="zone-title">Entrepôt ciment</div>
+                                        <div class="zone-sub">Ciment et matériaux lourds</div>
+                                        <div class="zone-sub">28 emplacements</div>
+                                        <div class="mini-progress"><div class="mini-progress-fill" style="width:68%; background:var(--purple);"></div></div>
+                                    </div>
+                                    <div class="zone-stats">
+                                        <div class="zone-pct">68%</div>
+                                        <div class="zone-status occupe">Occupé</div>
+                                    </div>
+                                </div>
+
+                                <!-- Zone 4 -->
+                                <div class="zone-item">
+                                    <div class="zone-num">4</div>
+                                    <div class="zone-icon" style="color:var(--orange); background:#ffedd5;"><i class="fa-solid fa-border-all"></i></div>
+                                    <div class="zone-details">
+                                        <div class="zone-title">Zone carrelage</div>
+                                        <div class="zone-sub">Carrelage et accessoires</div>
+                                        <div class="zone-sub">22 emplacements</div>
+                                        <div class="mini-progress"><div class="mini-progress-fill" style="width:71%; background:var(--orange);"></div></div>
+                                    </div>
+                                    <div class="zone-stats">
+                                        <div class="zone-pct">71%</div>
+                                        <div class="zone-status occupe">Occupé</div>
+                                    </div>
+                                </div>
+
+                                <!-- Zone 5 -->
+                                <div class="zone-item">
+                                    <div class="zone-num">5</div>
+                                    <div class="zone-icon" style="color:var(--danger); background:#fef2f2;"><i class="fa-solid fa-bars"></i></div>
+                                    <div class="zone-details">
+                                        <div class="zone-title">Arrière-cour (Fer à béton)</div>
+                                        <div class="zone-sub">Fer à béton et treillis soudés</div>
+                                        <div class="zone-sub">22 emplacements</div>
+                                        <div class="mini-progress"><div class="mini-progress-fill" style="width:65%; background:var(--danger);"></div></div>
+                                    </div>
+                                    <div class="zone-stats">
+                                        <div class="zone-pct">65%</div>
+                                        <div class="zone-status occupe">Occupé</div>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-outline-primary" style="margin-top:10px; justify-content:center; font-size:12px;"><i class="fa-solid fa-plus"></i> Ajouter une zone</button>
+                            </div>
+                        </div>
+
+                        <!-- TABLE EMPLACEMENTS -->
+                        <div class="card" style="margin-bottom:0; display:flex; flex-direction:column;">
+                            <div class="card-header" style="padding-bottom:10px;">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <h3>Emplacements - Hall d'entrée</h3>
+                                    <span class="badge-status status-service" style="font-size:10px; padding:2px 6px;">Zone 1</span>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <button class="btn btn-outline" style="font-size:11px;">Actions <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i></button>
+                                    <button class="btn btn-primary" style="font-size:11px;"><i class="fa-solid fa-plus"></i> Ajouter un emplacement</button>
+                                </div>
+                            </div>
+                            
+                            <div class="stats-row">
+                                <div class="stat-item"><span class="stat-val">24</span><span class="stat-label">Emplacements</span></div>
+                                <div class="stat-item"><span class="stat-val text-success">19</span><span class="stat-label">Occupés</span></div>
+                                <div class="stat-item"><span class="stat-val text-primary">5</span><span class="stat-label">Disponibles</span></div>
+                                <div class="stat-progress-container">
+                                    <div class="stat-progress-header"><span>81%</span><span>Taux d'occupation</span></div>
+                                    <div class="stat-progress-bg"><div class="stat-progress-fill"></div></div>
+                                </div>
+                            </div>
+
+                            <div style="overflow-x: auto; flex:1;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Nom de l'emplacement</th>
+                                            <th>Type</th>
+                                            <th>Capacité max.</th>
+                                            <th>Occupé</th>
+                                            <th>Taux</th>
+                                            <th>Statut</th>
+                                            <th style="text-align:right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="locations-table-body">
+                                        <!-- Rempli par JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px; border-top: 1px solid var(--border-color); font-size: 12px; background:white;">
+                                <div>Afficher <select style="padding:2px 5px;"><option>10</option></select> par page</div>
+                                <div style="display:flex; gap:5px;">
+                                    <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-left"></i></button>
+                                    <button class="btn btn-primary" style="padding:4px 10px;">1</button>
+                                    <button class="btn btn-outline" style="padding:4px 10px;">2</button>
+                                    <button class="btn btn-outline" style="padding:4px 10px;">3</button>
+                                    <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-right"></i></button>
+                                </div>
+                                <div>Page 1 sur 3</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTTOM SECTION -->
+                    <div class="bottom-layout">
+                        <!-- Occupation des zones -->
+                        <div class="card" style="margin-bottom:0;">
+                            <div class="card-header"><h3>Occupation des zones</h3></div>
+                            <div class="occupancy-list">
+                                <div class="occ-row">
+                                    <div class="occ-label">Hall d'entrée</div>
+                                    <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:81%; background:var(--primary);"></div></div>
+                                    <div class="occ-val">81%</div>
+                                </div>
+                                <div class="occ-row">
+                                    <div class="occ-label">Magasin de stock</div>
+                                    <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:75%; background:var(--success);"></div></div>
+                                    <div class="occ-val">75%</div>
+                                </div>
+                                <div class="occ-row">
+                                    <div class="occ-label">Entrepôt ciment</div>
+                                    <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:68%; background:var(--purple);"></div></div>
+                                    <div class="occ-val">68%</div>
+                                </div>
+                                <div class="occ-row">
+                                    <div class="occ-label">Zone carrelage</div>
+                                    <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:71%; background:var(--orange);"></div></div>
+                                    <div class="occ-val">71%</div>
+                                </div>
+                                <div class="occ-row">
+                                    <div class="occ-label">Arrière-cour (Fer à béton)</div>
+                                    <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:65%; background:var(--danger);"></div></div>
+                                    <div class="occ-val">65%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions Rapides -->
+                        <div class="card" style="margin-bottom:0;">
+                            <div class="card-header"><h3>Actions rapides</h3></div>
+                            <div class="quick-actions-grid">
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-plus" style="color:var(--primary);"></i>
+                                    <span>Ajouter une zone</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-layer-group" style="color:var(--success);"></i>
+                                    <span>Ajouter un emplacement</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-boxes-packing" style="color:var(--purple);"></i>
+                                    <span>Déplacer des produits</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-map" style="color:var(--orange);"></i>
+                                    <span>Plan du magasin</span>
+                                </div>
+                                <div class="action-btn full-width">
+                                    <i class="fa-solid fa-print" style="color:var(--text-muted);"></i>
+                                    <span>Imprimer la carte des emplacements</span>
+                                </div>
+                                <div class="action-btn full-width">
+                                    <i class="fa-solid fa-file-export" style="color:var(--text-muted);"></i>
+                                    <span>Exporter la structure</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- COLONNE DROITE (Détails) -->
+                <div class="details-panel">
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h3>Détails de l'emplacement</h3>
+                            <button class="btn btn-outline" style="padding: 5px 8px; border:none;"><i class="fa-solid fa-xmark" style="color:var(--text-muted);"></i></button>
+                        </div>
+
+                        <div class="location-title">
+                            <div class="loc-icon"><i class="fa-solid fa-layer-group"></i></div>
+                            <div class="loc-info">
+                                <span class="badge-status status-occupe" style="margin-bottom:5px;">Occupé</span>
+                                <h4>HL-01-01 - Étagère 1</h4>
+                                <p>Hall d'entrée > Étagères</p>
+                            </div>
+                        </div>
+
+                        <div class="details-list">
+                            <div class="detail-row"><span class="detail-label">Type</span><span class="detail-val">Étagère</span></div>
+                            <div class="detail-row"><span class="detail-label">Capacité maximale</span><span class="detail-val">150 produits</span></div>
+                            <div class="detail-row"><span class="detail-label">Capacité utilisée</span><span class="detail-val">120 produits</span></div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">Taux d'occupation</span>
+                                <span class="detail-val">80%</span>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bg"><div class="progress-fill"></div></div>
+                            </div>
+
+                            <div class="detail-row" style="margin-top:5px;"><span class="detail-label">Statut</span><span class="badge-status status-occupe">Occupé</span></div>
+                            <div class="detail-row"><span class="detail-label">Responsable</span><span class="detail-val">Admin</span></div>
+                            <div class="detail-row"><span class="detail-label">Date de création</span><span class="detail-val">12/01/2023</span></div>
+                            <div class="detail-row"><span class="detail-label">Dernière mise à jour</span><span class="detail-val">23/05/2025</span></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="products-list" style="border-top:none;">
+                            <div class="product-header">
+                                <h4>Produits dans cet emplacement (5 derniers)</h4>
+                                <a href="#">Voir tout</a>
+                            </div>
+                            <div id="products-in-location">
+                                <!-- Rempli par JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-card" style="border:none; background:transparent;">
+                        <div class="panel-footer" style="border-radius:10px; border:1px solid var(--border-color);">
+                            <button class="btn btn-outline-primary"><i class="fa-solid fa-boxes-packing"></i> Déplacer des produits</button>
+                            <button class="btn btn-outline-danger"><i class="fa-solid fa-trash"></i> Supprimer l'emplacement</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ================= MOCK DATA =================
+        const mockLocations = [
+            { code: "HL-01-01", name: "Étagère 1", type: "Étagère", max: "150 produits", used: "120", pct: "80%", status: "Occupé", statusClass: "status-occupe" },
+            { code: "HL-01-02", name: "Étagère 2", type: "Étagère", max: "150 produits", used: "110", pct: "73%", status: "Occupé", statusClass: "status-occupe" },
+            { code: "HL-01-03", name: "Étagère 3", type: "Étagère", max: "150 produits", used: "130", pct: "87%", status: "Occupé", statusClass: "status-occupe" },
+            { code: "HL-02-01", name: "Rayonnage A", type: "Rayonnage", max: "200 produits", used: "150", pct: "75%", status: "Occupé", statusClass: "status-occupe" },
+            { code: "HL-02-02", name: "Rayonnage B", type: "Rayonnage", max: "200 produits", used: "140", pct: "70%", status: "Occupé", statusClass: "status-occupe" },
+            { code: "HL-03-01", name: "Présentoir A", type: "Présentoir", max: "80 produits", used: "80", pct: "100%", status: "Plein", statusClass: "status-plein" },
+            { code: "HL-03-02", name: "Présentoir B", type: "Présentoir", max: "80 produits", used: "60", pct: "75%", status: "Occupé", statusClass: "status-occupe" },
+            { code: "HL-04-01", name: "Zone Caisse", type: "Comptoir", max: "-", used: "-", pct: "-", status: "Service", statusClass: "status-service" }
+        ];
+
+        const mockLocationProducts = [
+            { name: "Ciment CFAO 42.5R (Sac)", qty: "50 sac(s)" },
+            { name: "Fer à béton 12mm (Tige 12m)", qty: "30 pièce(s)" },
+            { name: "Colle carrelage 25kg", qty: "20 sac(s)" },
+            { name: "Peinture Blanc 20L", qty: "10 pot(s)" },
+            { name: "Gravier 10mm", qty: "10 sac(s)" }
+        ];
+
+        // ================= FONCTIONS =================
+
+        function renderLocationsTable() {
+            const tbody = document.getElementById('locations-table-body');
+            tbody.innerHTML = '';
+            
+            mockLocations.forEach(loc => {
+                // Couleur pour le taux
+                let pctColor = "var(--text-main)";
+                if(parseInt(loc.pct) >= 90) pctColor = "var(--danger)";
+                else if(parseInt(loc.pct) >= 75) pctColor = "var(--warning)";
+                else if(parseInt(loc.pct) > 0) pctColor = "var(--success)";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:500;">${loc.code}</td>
+                    <td>${loc.name}</td>
+                    <td>${loc.type}</td>
+                    <td>${loc.max}</td>
+                    <td>${loc.used}</td>
+                    <td style="color:${pctColor}; font-weight:600;">${loc.pct}</td>
+                    <td><span class="badge-status ${loc.statusClass}">${loc.status}</span></td>
+                    <td style="text-align:right;">
+                        <div style="display:flex; gap:5px; justify-content:flex-end;">
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:10px;"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:10px;"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderLocationProducts() {
+            const container = document.getElementById('products-in-location');
+            container.innerHTML = '';
+            
+            mockLocationProducts.forEach(prod => {
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                div.innerHTML = `
+                    <div class="product-item-left">
+                        <img src="https://via.placeholder.com/24" class="product-img" alt="img">
+                        <span>${prod.name}</span>
+                    </div>
+                    <span class="product-qty">${prod.qty}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLocationsTable();
+            renderLocationProducts();
+        });
+    </script>
+</body>
+</html>

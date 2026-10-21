@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYOKA QUINCA - Rapports & Statistiques</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ================= VARIABLES & RESET ================= */
+        :root {
+            --bg-sidebar: #0b132b;
+            --bg-body: #f4f7f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #9333ea;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .logo-container { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 15px 10px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px; padding: 10px 15px;
+            color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 4px;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+        .corp { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+
+        /* ================= MAIN LAYOUT ================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .topbar {
+            background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .topbar-title h1 { font-size: 20px; font-weight: 600; }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        
+        .btn { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+        .btn-outline { background: white; border-color: var(--border-color); color: var(--text-main); }
+        .btn-primary { background: var(--primary); color: white; }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .user-info span { display: block; color: var(--text-muted); font-size: 11px; }
+        .notification { position: relative; cursor: pointer; font-size: 18px; margin-right: 15px; color: var(--text-muted); }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* ================= CONTENT AREA ================= */
+        .content-scroll {
+            flex: 1; overflow-y: auto; padding: 20px 30px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* Tabs navigation */
+        .nav-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 10px; overflow-x: auto; justify-content: space-between; align-items: flex-end;}
+        .tabs-left { display: flex; gap: 25px; }
+        .tab { padding: 10px 0; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap;}
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+        .kpi-card {
+            background: var(--bg-card); padding: 15px; border-radius: 10px;
+            border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .kpi-info h4 { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 5px; }
+        .kpi-value { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .kpi-trend { font-size: 10px; font-weight: 500; }
+        .kpi-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; flex-shrink: 0; }
+
+        /* Cards Generic */
+        .card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column;}
+        .card-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+        .card-body { padding: 15px 20px; flex: 1; }
+
+        /* Main Layout Grids */
+        .row-charts { display: grid; grid-template-columns: 2fr 1.2fr 1.2fr; gap: 20px; }
+        .row-middle { display: grid; grid-template-columns: 1fr 1fr 1fr 1.2fr; gap: 20px; }
+        .row-bottom { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; }
+
+        /* Chart Containers */
+        .chart-container { position: relative; height: 220px; width: 100%; }
+        .chart-container-donut { position: relative; height: 180px; width: 100%; display: flex; justify-content: center; }
+        .donut-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;}
+        .donut-center-text .val { font-size: 18px; font-weight: 700; }
+        .donut-center-text .lbl { font-size: 10px; color: var(--text-muted); }
+
+        /* Lists & Rankings */
+        .top-list { display: flex; flex-direction: column; gap: 12px; }
+        .list-item { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+        .rank { width: 20px; height: 20px; border-radius: 50%; background: #f1f5f9; color: var(--text-muted); display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: 600; }
+        .list-info { flex: 1; }
+        .list-title { font-weight: 600; margin-bottom: 2px; }
+        .list-sub { font-size: 10px; color: var(--text-muted); }
+        .list-value { font-weight: 700; text-align: right; }
+        .list-value small { font-weight: 400; color: var(--text-muted); font-size: 10px;}
+
+        .progress-bar-sm { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 5px; overflow: hidden; }
+        .progress-fill-sm { height: 100%; background: var(--success); border-radius: 2px; }
+
+        /* Alerts & Badges */
+        .alert-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .alert-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .alert-info { display: flex; align-items: center; gap: 10px; }
+        .alert-img { width: 24px; height: 24px; border-radius: 4px; background: #e2e8f0; }
+        
+        .badge-status { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; }
+        .status-warning { background: #fef3c7; color: var(--warning); }
+        .status-danger { background: #fee2e2; color: var(--danger); }
+        
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-success { background: var(--success); }
+        .dot-warning { background: var(--warning); }
+        .dot-danger { background: var(--danger); }
+
+        /* Mini Boxes (Stock/Flux) */
+        .mini-boxes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px;}
+        .mini-box { border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; text-align: left; }
+        .mini-box-title { font-size: 10px; color: var(--text-muted); margin-bottom: 5px; }
+        .mini-box-val { font-size: 16px; font-weight: 700; margin-bottom: 5px; }
+        .mini-box-link { font-size: 9px; color: var(--primary); text-decoration: none; }
+
+        /* Actions Grid */
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .action-btn { background: white; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s;}
+        .action-btn:hover { border-color: var(--primary); }
+        .action-btn i { font-size: 18px; color: var(--primary); }
+        .action-btn span { font-size: 11px; font-weight: 500; }
+        .btn-full { grid-column: span 2; flex-direction: row; justify-content: center; border-color: #bfdbfe; background: #eff6ff; color: var(--primary); }
+
+        /* Footer */
+        .footer { text-align: center; font-size: 10px; color: var(--text-muted); padding: 15px 0; display: flex; justify-content: space-between;}
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div style="background: white; padding: 5px; border-radius: 8px;"><i class="fa-solid fa-store" style="color: var(--primary); font-size: 24px;"></i></div>
+            <div><h2 style="font-size: 18px; letter-spacing: 1px;">AYOKA</h2><p style="font-size: 10px; color: #cbd5e1; letter-spacing: 2px;">QUINCA</p></div>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+            <a href="produits.html" class="nav-item"><i class="fa-solid fa-box"></i> Produits</a>
+            <a href="stock.html" class="nav-item"><i class="fa-solid fa-layer-group"></i> Stock</a>
+            <a href="ventes.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Ventes</a>
+            <a href="achats.html" class="nav-item"><i class="fa-solid fa-bag-shopping"></i> Achats</a>
+            <a href="inventaire.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+            <a href="fournisseurs.html" class="nav-item"><i class="fa-solid fa-users"></i> Fournisseurs</a>
+            <a href="clients.html" class="nav-item"><i class="fa-solid fa-user"></i> Clients</a>
+            <a href="emplacements.html" class="nav-item"><i class="fa-solid fa-location-dot"></i> Emplacements</a>
+            <a href="historique.html" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+            <a href="rapports.html" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Rapports & Statistiques</a>
+            <a href="utilisateurs.html" class="nav-item"><i class="fa-solid fa-user-shield"></i> Utilisateurs</a>
+            <a href="parametres.html" class="nav-item"><i class="fa-solid fa-gear"></i> Paramètres</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="corp">
+                <div style="background: var(--primary); padding: 8px; border-radius: 8px;"><i class="fa-solid fa-shield-halved"></i></div>
+                <div><p style="font-weight: 600;">MSM-CORP</p><p style="font-size: 11px; color: #cbd5e1;">Solutions digitales</p></div>
+            </div>
+            <div style="color: #cbd5e1; cursor: pointer;"><i class="fa-solid fa-angles-left"></i> Réduire le menu</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Rapports & Statistiques</h1>
+                <p>Analysez les performances de votre activité avec des rapports détaillés.</p>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn btn-outline"><i class="fa-regular fa-calendar"></i> 01/05/2025 - 25/05/2025 <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                <button class="btn btn-outline"><i class="fa-solid fa-code-compare"></i> Comparer</button>
+                <button class="btn btn-outline"><i class="fa-solid fa-file-export"></i> Exporter <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                
+                <div class="notification"><i class="fa-regular fa-bell"></i><span class="badge">7</span></div>
+                <div class="user-profile">
+                    <div style="background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white;"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info"><strong>Admin</strong><span>Administrateur</span></div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 5px; cursor: pointer;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-scroll">
+            
+            <!-- Tabs -->
+            <div class="nav-tabs">
+                <div class="tabs-left">
+                    <div class="tab active">Vue d'ensemble</div>
+                    <div class="tab">Ventes</div>
+                    <div class="tab">Achats</div>
+                    <div class="tab">Stock</div>
+                    <div class="tab">Produits</div>
+                    <div class="tab">Clients</div>
+                    <div class="tab">Fournisseurs</div>
+                    <div class="tab">Inventaires</div>
+                    <div class="tab">Finances</div>
+                </div>
+                <button class="btn btn-outline" style="padding:5px 10px; font-size:11px; margin-bottom:5px;"><i class="fa-solid fa-filter"></i> Filtres avancés</button>
+            </div>
+
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Chiffre d'affaires</h4>
+                        <div class="kpi-value">12 450 000 <span style="font-size:10px;">FCFA</span></div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 18.6% vs préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #eff6ff; color: var(--primary);"><i class="fa-solid fa-sack-dollar"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Bénéfice brut</h4>
+                        <div class="kpi-value">3 250 000 <span style="font-size:10px;">FCFA</span></div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 14.2% vs préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #ecfdf5; color: var(--success);"><i class="fa-solid fa-chart-line"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Total ventes</h4>
+                        <div class="kpi-value">356</div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 12.1% vs préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #f3e8ff; color: var(--purple);"><i class="fa-solid fa-cart-shopping"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Total achats</h4>
+                        <div class="kpi-value">198</div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 8.7% vs préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fffbeb; color: var(--warning);"><i class="fa-solid fa-bag-shopping"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Marge bénéficiaire</h4>
+                        <div class="kpi-value text-success">26.1%</div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 2.3% vs préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #ecfdf5; color: var(--success);"><i class="fa-solid fa-percent"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Créances clients</h4>
+                        <div class="kpi-value text-danger">2 170 000 <span style="font-size:10px;">FCFA</span></div>
+                        <div class="kpi-trend text-danger"><i class="fa-solid fa-arrow-down"></i> 5.6% vs préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fef2f2; color: var(--danger);"><i class="fa-solid fa-file-invoice"></i></div>
+                </div>
+            </div>
+
+            <!-- ROW 1: CHARTS -->
+            <div class="row-charts">
+                <!-- Line Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Évolution du chiffre d'affaires</h3>
+                        <select class="btn-outline" style="padding:4px 8px; font-size:11px;"><option>Par jour</option></select>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container"><canvas id="caChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Donut Categories -->
+                <div class="card">
+                    <div class="card-header"><h3>Répartition des ventes par catégorie</h3></div>
+                    <div class="card-body" style="display:flex; align-items:center;">
+                        <div style="width:45%; position:relative;">
+                            <div class="chart-container-donut"><canvas id="catChart"></canvas></div>
+                            <div class="donut-center-text">
+                                <div class="val">12 450 000</div>
+                                <div class="lbl">Total</div>
+                            </div>
+                        </div>
+                        <div style="width:55%; font-size:11px; padding-left:10px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:5px;"><div class="dot" style="background:#2563eb;"></div>Ciment</span><span style="font-weight:600;">35.2%</span></div>
+                            <div style="font-size:9px; color:var(--text-muted); text-align:right; margin-top:-8px; margin-bottom:8px;">4 380 000 FCFA</div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:5px;"><div class="dot" style="background:#10b981;"></div>Fer à béton</span><span style="font-weight:600;">24.8%</span></div>
+                            <div style="font-size:9px; color:var(--text-muted); text-align:right; margin-top:-8px; margin-bottom:8px;">3 085 000 FCFA</div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:5px;"><div class="dot" style="background:#f59e0b;"></div>Carrelage</span><span style="font-weight:600;">18.7%</span></div>
+                            <div style="font-size:9px; color:var(--text-muted); text-align:right; margin-top:-8px; margin-bottom:8px;">2 330 000 FCFA</div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:5px;"><div class="dot" style="background:#a855f7;"></div>Peintures</span><span style="font-weight:600;">9.5%</span></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:5px;"><div class="dot" style="background:#ef4444;"></div>Matériaux divers</span><span style="font-weight:600;">7.8%</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="display:flex; align-items:center; gap:5px;"><div class="dot" style="background:#cbd5e1;"></div>Autres</span><span style="font-weight:600;">3.8%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 5 Products -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Top 5 produits les plus vendus</h3>
+                        <select class="btn-outline" style="padding:4px 8px; font-size:11px;"><option>En quantité</option></select>
+                    </div>
+                    <div class="card-body top-list">
+                        <div class="list-item">
+                            <div class="rank" style="background:#eff6ff; color:var(--primary);">1</div>
+                            <img src="https://via.placeholder.com/24" class="alert-img">
+                            <div class="list-info">
+                                <div class="list-title">Ciment CFAO 42.5R (Sac)</div>
+                                <div class="list-sub">1 875 000 FCFA</div>
+                                <div class="progress-bar-sm"><div class="progress-fill-sm" style="width:100%;"></div></div>
+                            </div>
+                            <div class="list-value">1 250 <small>sac(s)</small></div>
+                        </div>
+                        <div class="list-item">
+                            <div class="rank">2</div>
+                            <img src="https://via.placeholder.com/24" class="alert-img">
+                            <div class="list-info">
+                                <div class="list-title">Fer à béton 12mm (Tige 12m)</div>
+                                <div class="list-sub">1 445 000 FCFA</div>
+                                <div class="progress-bar-sm"><div class="progress-fill-sm" style="width:68%;"></div></div>
+                            </div>
+                            <div class="list-value">850 <small>pièce(s)</small></div>
+                        </div>
+                        <div class="list-item">
+                            <div class="rank">3</div>
+                            <img src="https://via.placeholder.com/24" class="alert-img">
+                            <div class="list-info">
+                                <div class="list-title">Colle carrelage 25kg</div>
+                                <div class="list-sub">1 240 000 FCFA</div>
+                                <div class="progress-bar-sm"><div class="progress-fill-sm" style="width:49%;"></div></div>
+                            </div>
+                            <div class="list-value">620 <small>sac(s)</small></div>
+                        </div>
+                        <div class="list-item">
+                            <div class="rank">4</div>
+                            <img src="https://via.placeholder.com/24" class="alert-img">
+                            <div class="list-info">
+                                <div class="list-title">Gravier 10mm</div>
+                                <div class="list-sub">810 000 FCFA</div>
+                                <div class="progress-bar-sm"><div class="progress-fill-sm" style="width:43%;"></div></div>
+                            </div>
+                            <div class="list-value">540 <small>m³</small></div>
+                        </div>
+                        <div class="list-item">
+                            <div class="rank">5</div>
+                            <img src="https://via.placeholder.com/24" class="alert-img">
+                            <div class="list-info">
+                                <div class="list-title">Peinture Blanc 20L</div>
+                                <div class="list-sub">620 000 FCFA</div>
+                                <div class="progress-bar-sm"><div class="progress-fill-sm" style="width:24%;"></div></div>
+                            </div>
+                            <div class="list-value">310 <small>pot(s)</small></div>
+                        </div>
+                    </div>
+                    <div style="padding:10px 20px; border-top:1px solid var(--border-color); text-align:center;">
+                         <a href="#" style="font-size:11px; color:var(--primary); text-decoration:none;">Voir tous les produits</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 2: MIDDLE LISTS & CHARTS -->
+            <div class="row-middle">
+                <!-- Stock State -->
+                <div class="card">
+                    <div class="card-header"><h3>État du stock</h3></div>
+                    <div class="card-body">
+                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                            <div style="width:50%; position:relative;">
+                                <div class="chart-container-donut" style="height:120px;"><canvas id="stockChart"></canvas></div>
+                                <div class="donut-center-text">
+                                    <div class="val" style="font-size:16px;">2 845</div>
+                                    <div class="lbl">Produits</div>
+                                </div>
+                            </div>
+                            <div style="width:50%; font-size:11px; display:flex; flex-direction:column; gap:10px;">
+                                <div><span class="dot dot-success" style="margin-right:5px;"></span>En stock <strong>2 125 (74.7%)</strong></div>
+                                <div><span class="dot dot-warning" style="margin-right:5px;"></span>Stock faible <strong>420 (14.8%)</strong></div>
+                                <div><span class="dot dot-danger" style="margin-right:5px;"></span>Rupture <strong>300 (10.5%)</strong></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mini-boxes">
+                            <div class="mini-box">
+                                <div class="mini-box-title">Stock faible</div>
+                                <div class="mini-box-val text-warning">420 <span style="font-size:10px; font-weight:400;">produits</span></div>
+                                <a href="#" class="mini-box-link">Voir la liste</a>
+                            </div>
+                            <div class="mini-box">
+                                <div class="mini-box-title">Rupture de stock</div>
+                                <div class="mini-box-val text-danger">300 <span style="font-size:10px; font-weight:400;">produits</span></div>
+                                <a href="#" class="mini-box-link">Voir la liste</a>
+                            </div>
+                            <div class="mini-box">
+                                <div class="mini-box-title">Surstock</div>
+                                <div class="mini-box-val text-success">85 <span style="font-size:10px; font-weight:400;">produits</span></div>
+                                <a href="#" class="mini-box-link">Voir la liste</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 5 Clients -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Top 5 clients</h3>
+                        <select class="btn-outline" style="padding:2px 5px; font-size:10px;"><option>Par chiffre d'affaires</option></select>
+                    </div>
+                    <div class="card-body top-list">
+                        <div class="list-item"><div class="rank">1</div><div class="list-info"><div class="list-title">M. Koffi</div></div><div class="list-value">2 450 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">2</div><div class="list-info"><div class="list-title">Awa Kossi</div></div><div class="list-value">1 850 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">3</div><div class="list-info"><div class="list-title">Bénin Ahouandjinou</div></div><div class="list-value">980 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">4</div><div class="list-info"><div class="list-title">Société Dossou</div></div><div class="list-value">850 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">5</div><div class="list-info"><div class="list-title">Tchibo Gérard</div></div><div class="list-value">720 000 FCFA</div></div>
+                    </div>
+                    <div style="padding:10px 20px; border-top:1px solid var(--border-color); text-align:center;">
+                         <a href="#" style="font-size:11px; color:var(--primary); text-decoration:none;">Voir tous les clients</a>
+                    </div>
+                </div>
+
+                <!-- Top 5 Fournisseurs -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Top 5 fournisseurs</h3>
+                        <select class="btn-outline" style="padding:2px 5px; font-size:10px;"><option>Par montant d'achats</option></select>
+                    </div>
+                    <div class="card-body top-list">
+                        <div class="list-item"><div class="rank">1</div><div class="list-info"><div class="list-title">SOCIMAT</div></div><div class="list-value">2 850 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">2</div><div class="list-info"><div class="list-title">CFAO Bénin</div></div><div class="list-value">1 950 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">3</div><div class="list-info"><div class="list-title">BTP Plus</div></div><div class="list-value">1 250 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">4</div><div class="list-info"><div class="list-title">Quinca Express</div></div><div class="list-value">980 000 FCFA</div></div>
+                        <div class="list-item"><div class="rank">5</div><div class="list-info"><div class="list-title">Bénin Matériaux</div></div><div class="list-value">890 000 FCFA</div></div>
+                    </div>
+                    <div style="padding:10px 20px; border-top:1px solid var(--border-color); text-align:center;">
+                         <a href="#" style="font-size:11px; color:var(--primary); text-decoration:none;">Voir tous les fournisseurs</a>
+                    </div>
+                </div>
+
+                <!-- Produits à surveiller -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Produits à surveiller</h3>
+                        <a href="#" style="font-size:11px; color:var(--primary); text-decoration:none;">Voir tout</a>
+                    </div>
+                    <div class="card-body" style="display:flex; flex-direction:column; gap:5px;">
+                        <div class="alert-row">
+                            <div class="alert-info">
+                                <img src="https://via.placeholder.com/24" class="alert-img">
+                                <div>
+                                    <div style="font-size:12px; font-weight:500;">Ciment Super Rapid (Sac)</div>
+                                    <div style="font-size:10px; color:var(--text-muted);">Stock faible: 15 sac(s)</div>
+                                </div>
+                            </div>
+                            <span class="badge-status status-warning">Stock faible</span>
+                        </div>
+                        <div class="alert-row">
+                            <div class="alert-info">
+                                <img src="https://via.placeholder.com/24" class="alert-img">
+                                <div>
+                                    <div style="font-size:12px; font-weight:500;">Fer à béton 10mm (Tige 12m)</div>
+                                    <div style="font-size:10px; color:var(--text-muted);">Stock faible: 20 pièce(s)</div>
+                                </div>
+                            </div>
+                            <span class="badge-status status-warning">Stock faible</span>
+                        </div>
+                        <div class="alert-row">
+                            <div class="alert-info">
+                                <img src="https://via.placeholder.com/24" class="alert-img">
+                                <div>
+                                    <div style="font-size:12px; font-weight:500;">Colle carrelage 25kg</div>
+                                    <div style="font-size:10px; color:var(--text-muted);">Stock faible: 18 sac(s)</div>
+                                </div>
+                            </div>
+                            <span class="badge-status status-warning">Stock faible</span>
+                        </div>
+                        <div class="alert-row">
+                            <div class="alert-info">
+                                <img src="https://via.placeholder.com/24" class="alert-img">
+                                <div>
+                                    <div style="font-size:12px; font-weight:500;">Peinture Rouge 20L</div>
+                                    <div style="font-size:10px; color:var(--text-muted);">Rupture de stock</div>
+                                </div>
+                            </div>
+                            <span class="badge-status status-danger">Rupture</span>
+                        </div>
+                        <div class="alert-row">
+                            <div class="alert-info">
+                                <img src="https://via.placeholder.com/24" class="alert-img">
+                                <div>
+                                    <div style="font-size:12px; font-weight:500;">Gravier 5mm</div>
+                                    <div style="font-size:10px; color:var(--text-muted);">Rupture de stock</div>
+                                </div>
+                            </div>
+                            <span class="badge-status status-danger">Rupture</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 3: BOTTOM -->
+            <div class="row-bottom">
+                <!-- Bar Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Résumé des mouvements de stock</h3>
+                        <div style="font-size:11px; display:flex; gap:15px;">
+                            <span><div class="dot" style="background:var(--success); margin-right:5px;"></div>Entrées</span>
+                            <span><div class="dot" style="background:var(--danger); margin-right:5px;"></div>Sorties</span>
+                        </div>
+                    </div>
+                    <div class="card-body" style="display:flex; gap:20px;">
+                        <div style="flex:2;">
+                            <div class="chart-container" style="height:180px;"><canvas id="movementChart"></canvas></div>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px;">
+                            <div class="mini-box" style="background:#ecfdf5; border-color:#a7f3d0;">
+                                <div class="mini-box-title" style="color:var(--success);">Entrées</div>
+                                <div class="mini-box-val" style="color:var(--success);">1 245</div>
+                                <div style="font-size:10px; color:var(--success); margin-bottom:2px;">+25.3%</div>
+                                <div style="font-size:9px; color:var(--text-muted);">Valeur: 7 850 000 FCFA</div>
+                            </div>
+                            <div class="mini-box" style="background:#fef2f2; border-color:#fecaca;">
+                                <div class="mini-box-title" style="color:var(--danger);">Sorties</div>
+                                <div class="mini-box-val" style="color:var(--danger);">1 320</div>
+                                <div style="font-size:10px; color:var(--danger); margin-bottom:2px;">+18.7%</div>
+                                <div style="font-size:9px; color:var(--text-muted);">Valeur: 8 620 000 FCFA</div>
+                            </div>
+                            <div class="mini-box" style="background:#eff6ff; border-color:#bfdbfe;">
+                                <div class="mini-box-title" style="color:var(--primary);">Transferts</div>
+                                <div class="mini-box-val" style="color:var(--primary);">85</div>
+                                <div style="font-size:9px; color:var(--text-muted); margin-top:20px;">Valeur: 450 000 FCFA</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Rapides -->
+                <div class="card">
+                    <div class="card-header"><h3>Actions rapides</h3></div>
+                    <div class="card-body actions-grid">
+                        <div class="action-btn">
+                            <i class="fa-solid fa-file-invoice"></i>
+                            <span>Rapport des ventes</span>
+                            <small style="font-size:9px; color:var(--text-muted); text-align:center;">Générer un rapport</small>
+                        </div>
+                        <div class="action-btn">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <span>Rapport des achats</span>
+                            <small style="font-size:9px; color:var(--text-muted); text-align:center;">Générer un rapport</small>
+                        </div>
+                        <div class="action-btn">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                            <span>Rapport de stock</span>
+                            <small style="font-size:9px; color:var(--text-muted); text-align:center;">État du stock</small>
+                        </div>
+                        <div class="action-btn">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            <span>Rapport financier</span>
+                            <small style="font-size:9px; color:var(--text-muted); text-align:center;">Résultat & bénéfice</small>
+                        </div>
+                        <div class="action-btn btn-full">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Personnaliser un rapport</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div>© 2025 MSM Stock Manager - Tous droits réservés.</div>
+                <div>Version 1.0.0</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT - CHART.JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Configuration globale pour Chart.js
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.size = 10;
+
+            // 1. Graphique Ligne (CA)
+            const ctxCa = document.getElementById('caChart').getContext('2d');
+            let gradientCa = ctxCa.createLinearGradient(0, 0, 0, 200);
+            gradientCa.addColorStop(0, 'rgba(37, 99, 235, 0.1)');
+            gradientCa.addColorStop(1, 'rgba(37, 99, 235, 0)');
+
+            new Chart(ctxCa, {
+                type: 'line',
+                data: {
+                    labels: ['01/05', '05/05', '10/05', '15/05', '20/05', '25/05'],
+                    datasets: [
+                        {
+                            label: 'Période actuelle',
+                            data: [500000, 800000, 1200000, 900000, 1500000, 1800000],
+                            borderColor: '#2563eb',
+                            backgroundColor: gradientCa,
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 4
+                        },
+                        {
+                            label: 'Période précédente',
+                            data: [400000, 600000, 900000, 700000, 1000000, 1100000],
+                            borderColor: '#94a3b8',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', align: 'start', labels: { usePointStyle: true, boxWidth: 8 } } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: (val) => val/1000000 + 'M FCFA' }, grid: { borderDash: [4, 4] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Graphique Donut (Catégories)
+            const ctxCat = document.getElementById('catChart').getContext('2d');
+            new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ciment', 'Fer à béton', 'Carrelage', 'Peintures', 'Matériaux divers', 'Autres'],
+                    datasets: [{
+                        data: [35.2, 24.8, 18.7, 9.5, 7.8, 3.8],
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#a855f7', '#ef4444', '#cbd5e1'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // 3. Graphique Donut (État du stock)
+            const ctxStock = document.getElementById('stockChart').getContext('2d');
+            new Chart(ctxStock, {
+                type: 'doughnut',
+                data: {
+                    labels: ['En stock', 'Stock faible', 'Rupture'],
+                    datasets: [{
+                        data: [74.7, 14.8, 10.5],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // 4. Graphique Barres (Mouvements)
+            const ctxMov = document.getElementById('movementChart').getContext('2d');
+            new Chart(ctxMov, {
+                type: 'bar',
+                data: {
+                    labels: ['01/05', '05/05', '10/05', '15/05', '20/05', '25/05'],
+                    datasets: [
+                        { label: 'Entrées', data: [120, 250, 180, 350, 220, 400], backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.6 },
+                        { label: 'Sorties', data: [180, 200, 300, 280, 310, 380], backgroundColor: '#ef4444', borderRadius: 4, barPercentage: 0.6 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 500, grid: { borderDash: [4, 4] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYOKA QUINCA - Historique</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================= VARIABLES & RESET ================= */
+        :root {
+            --bg-sidebar: #0b132b;
+            --bg-body: #f4f7f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #9333ea;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .logo-container { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 15px 10px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px; padding: 10px 15px;
+            color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 4px;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+        .corp { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+
+        /* ================= MAIN LAYOUT ================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .topbar {
+            background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .topbar-title h1 { font-size: 20px; font-weight: 600; }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        
+        .btn { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+        .btn-outline { background: white; border-color: var(--border-color); color: var(--text-main); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline-primary { background: white; border-color: var(--primary); color: var(--primary); }
+        .btn-outline-danger { background: white; border-color: var(--danger); color: var(--danger); }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .user-info span { display: block; color: var(--text-muted); font-size: 11px; }
+        .notification { position: relative; cursor: pointer; font-size: 18px; margin-right: 15px; color: var(--text-muted); }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* ================= CONTENT AREA ================= */
+        .content-scroll {
+            flex: 1; overflow-y: auto; padding: 25px 30px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* KPIs (6 columns) */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+        .kpi-card {
+            background: var(--bg-card); padding: 15px; border-radius: 10px;
+            border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .kpi-info h4 { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+        .kpi-value { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+        .kpi-trend { font-size: 10px; font-weight: 500; }
+        .kpi-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; flex-shrink: 0; }
+
+        /* Layout 2 Colonnes */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
+        
+        /* Filters Top */
+        .filters-row {
+            display: flex; gap: 10px; padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc; align-items: center; flex-wrap: wrap;
+        }
+        .search-box {
+            display: flex; align-items: center; background: white; border: 1px solid var(--border-color);
+            padding: 6px 12px; border-radius: 6px; width: 250px; color: var(--text-muted);
+        }
+        .search-box input { border: none; background: transparent; outline: none; margin-left: 8px; width: 100%; font-size: 12px; }
+        .filters-row select {
+            padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; font-size: 12px; color: var(--text-main); background: white; flex: 1;
+        }
+        .btn-filter { background: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px;}
+
+        /* Tabs */
+        .tabs-container { display: flex; border-bottom: 1px solid var(--border-color); padding: 0 20px; background: white; overflow-x: auto;}
+        .tab { padding: 15px 15px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; white-space: nowrap; display: flex; align-items: center; gap: 5px;}
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-badge { background: #e2e8f0; color: var(--text-muted); font-size: 10px; padding: 2px 6px; border-radius: 10px; }
+        .tab.active .tab-badge { background: #eff6ff; color: var(--primary); }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 15px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px 15px; font-size: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; cursor: pointer; }
+        
+        /* Opération Cell */
+        .op-cell { display: flex; align-items: center; gap: 10px; }
+        .op-icon { width: 24px; height: 24px; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 12px; }
+        
+        .badge-type { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 600; text-transform: uppercase;}
+        
+        /* Couleurs Spécifiques Opérations */
+        .op-vente { background: #dcfce7; color: #16a34a; }
+        .op-achat { background: #f3e8ff; color: #9333ea; }
+        .op-stock { background: #ffedd5; color: #ea580c; }
+        .op-inventaire { background: #ccfbf1; color: #0d9488; }
+        .op-modif { background: #e0e7ff; color: #4f46e5; }
+        .op-connexion { background: #f1f5f9; color: #64748b; }
+
+        .badge-status { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;}
+        .status-succes { background: #dcfce7; color: var(--success); }
+
+        /* Right Panel (Détails) */
+        .details-panel { display: flex; flex-direction: column; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); }
+        .panel-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .panel-header h3 { font-size: 15px; font-weight: 600; }
+        
+        .panel-body { padding: 20px; }
+        
+        .detail-header-box { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start;}
+        .detail-icon-large { width: 45px; height: 45px; background: #dcfce7; color: var(--success); border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .detail-info h2 { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+        .detail-info .ref { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 2px;}
+        .detail-info .date { font-size: 11px; color: var(--text-muted); }
+        
+        .details-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; font-size: 12px;}
+        .detail-row { display: flex; justify-content: space-between; align-items: flex-start;}
+        .detail-label { color: var(--text-muted); width: 40%; }
+        .detail-value { font-weight: 500; text-align: right; width: 60%; }
+        .detail-value.text-danger { color: var(--danger); font-weight: 700;}
+
+        .section-title { font-size: 12px; font-weight: 600; margin-bottom: 10px; border-top: 1px solid var(--border-color); padding-top: 15px;}
+        
+        .product-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;}
+        .product-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .product-item-left { display: flex; align-items: center; gap: 10px; }
+        .product-img { width: 24px; height: 24px; background: #e2e8f0; border-radius: 4px; }
+        .product-qty { color: var(--text-muted); }
+
+        .panel-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
+        .panel-footer .btn { justify-content: center; width: 100%; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div style="background: white; padding: 5px; border-radius: 8px;"><i class="fa-solid fa-store" style="color: var(--primary); font-size: 24px;"></i></div>
+            <div><h2 style="font-size: 18px; letter-spacing: 1px;">AYOKA</h2><p style="font-size: 10px; color: #cbd5e1; letter-spacing: 2px;">QUINCA</p></div>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+            <a href="produits.html" class="nav-item"><i class="fa-solid fa-box"></i> Produits</a>
+            <a href="stock.html" class="nav-item"><i class="fa-solid fa-layer-group"></i> Stock</a>
+            <a href="ventes.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Ventes</a>
+            <a href="achats.html" class="nav-item"><i class="fa-solid fa-bag-shopping"></i> Achats</a>
+            <a href="inventaire.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+            <a href="fournisseurs.html" class="nav-item"><i class="fa-solid fa-users"></i> Fournisseurs</a>
+            <a href="clients.html" class="nav-item"><i class="fa-solid fa-user"></i> Clients</a>
+            <a href="emplacements.html" class="nav-item"><i class="fa-solid fa-location-dot"></i> Emplacements</a>
+            <a href="historique.html" class="nav-item active"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+            <a href="rapports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Rapports & Statistiques</a>
+            <a href="utilisateurs.html" class="nav-item"><i class="fa-solid fa-user-shield"></i> Utilisateurs</a>
+            <a href="parametres.html" class="nav-item"><i class="fa-solid fa-gear"></i> Paramètres</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="corp">
+                <div style="background: var(--primary); padding: 8px; border-radius: 8px;"><i class="fa-solid fa-shield-halved"></i></div>
+                <div><p style="font-weight: 600;">MSM-CORP</p><p style="font-size: 11px; color: #cbd5e1;">Solutions digitales</p></div>
+            </div>
+            <div style="color: #cbd5e1; cursor: pointer;"><i class="fa-solid fa-angles-left"></i> Réduire le menu</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Historique</h1>
+                <p>Consultez l'historique complet des activités et opérations du système.</p>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn btn-outline"><i class="fa-regular fa-calendar"></i> 01/05/2025 - 25/05/2025 <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                <button class="btn btn-outline"><i class="fa-solid fa-rotate-right"></i> Actualiser</button>
+                <button class="btn btn-outline"><i class="fa-solid fa-file-export"></i> Exporter <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                
+                <div class="notification"><i class="fa-regular fa-bell"></i><span class="badge">7</span></div>
+                <div class="user-profile">
+                    <div style="background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white;"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info"><strong>Admin</strong><span>Administrateur</span></div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 5px; cursor: pointer;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-scroll">
+            
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Total opérations</h4>
+                        <div class="kpi-value text-primary">2 458</div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 12.5% vs préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #eff6ff; color: var(--primary);"><i class="fa-solid fa-list-ul"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Ventes</h4>
+                        <div class="kpi-value text-success">985</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">39.0% du total</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #ecfdf5; color: var(--success);"><i class="fa-solid fa-cart-shopping"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Achats</h4>
+                        <div class="kpi-value text-purple">612</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">24.9% du total</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #f3e8ff; color: var(--purple);"><i class="fa-solid fa-bag-shopping"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Mouvements de stock</h4>
+                        <div class="kpi-value text-warning">684</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">27.8% du total</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fffbeb; color: var(--warning);"><i class="fa-solid fa-box"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Inventaires</h4>
+                        <div class="kpi-value" style="color:#0d9488;">98</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">4.0% du total</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #ccfbf1; color: #0d9488;"><i class="fa-solid fa-clipboard-check"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Autres opérations</h4>
+                        <div class="kpi-value" style="color:var(--text-muted);">79</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">3.2% du total</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #f1f5f9; color: var(--text-muted);"><i class="fa-solid fa-ellipsis"></i></div>
+                </div>
+            </div>
+
+            <!-- MAIN LAYOUT -->
+            <div class="main-layout">
+                
+                <!-- COLONNE GAUCHE (Liste) -->
+                <div class="card">
+                    <div class="filters-row">
+                        <div class="search-box" style="width: 100%; max-width: 300px;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" placeholder="Rechercher (produit, document, référence...)">
+                            <span style="font-size: 10px; color:var(--text-muted);">Ctrl + K</span>
+                        </div>
+                        <button class="btn-filter" style="margin-left:auto;"><i class="fa-solid fa-filter"></i> Filtres avancés</button>
+                    </div>
+                    
+                    <div class="filters-row" style="border-top:none; padding-top:0;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <label style="font-size:10px; color:var(--text-muted);">Type d'opération</label>
+                            <select><option>Tous les types</option></select>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <label style="font-size:10px; color:var(--text-muted);">Sous-type</label>
+                            <select><option>Tous les sous-types</option></select>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <label style="font-size:10px; color:var(--text-muted);">Utilisateur</label>
+                            <select><option>Tous les utilisateurs</option></select>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <label style="font-size:10px; color:var(--text-muted);">Produit</label>
+                            <div class="search-box" style="width:100%; padding:6px 10px;"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Rechercher un produit..."></div>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <label style="font-size:10px; color:var(--text-muted);">Emplacement</label>
+                            <select><option>Tous les emplacements</option></select>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <label style="font-size:10px; color:var(--text-muted);">Résultat</label>
+                            <select><option>Tous les résultats</option></select>
+                        </div>
+                    </div>
+
+                    <div class="tabs-container">
+                        <div class="tab active">Toutes les opérations <span class="tab-badge">2 458</span></div>
+                        <div class="tab">Ventes <span class="tab-badge">985</span></div>
+                        <div class="tab">Achats <span class="tab-badge">612</span></div>
+                        <div class="tab">Mouvements de stock <span class="tab-badge">684</span></div>
+                        <div class="tab">Inventaires <span class="tab-badge">98</span></div>
+                        <div class="tab">Modifications <span class="tab-badge">45</span></div>
+                        <div class="tab">Connexions <span class="tab-badge">34</span></div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date / Heure</th>
+                                    <th>Type d'opération</th>
+                                    <th>Sous-type</th>
+                                    <th>Description</th>
+                                    <th>Référence</th>
+                                    <th>Utilisateur</th>
+                                    <th>Emplacement</th>
+                                    <th>Résultat</th>
+                                    <th style="text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- Rempli par JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px; border-top: 1px solid var(--border-color); font-size: 12px;">
+                        <div>Afficher <select style="padding:2px 5px;"><option>10</option></select> par page</div>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angles-left"></i></button>
+                            <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-left"></i></button>
+                            <button class="btn btn-primary" style="padding:4px 10px;">1</button>
+                            <button class="btn btn-outline" style="padding:4px 10px;">2</button>
+                            <button class="btn btn-outline" style="padding:4px 10px;">3</button>
+                            <button class="btn btn-outline" style="padding:4px 10px;">4</button>
+                            <button class="btn btn-outline" style="padding:4px 10px;">5</button>
+                            <span style="padding:0 5px;">...</span>
+                            <button class="btn btn-outline" style="padding:4px 10px;">246</button>
+                            <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-right"></i></button>
+                            <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angles-right"></i></button>
+                        </div>
+                        <div>Page 1 sur 246</div>
+                    </div>
+                </div>
+
+                <!-- COLONNE DROITE (Détails) -->
+                <div class="details-panel">
+                    <div class="panel-header">
+                        <h3>Détails de l'opération</h3>
+                        <button class="btn btn-outline" style="padding: 5px 8px; border:none;"><i class="fa-solid fa-xmark" style="color:var(--text-muted);"></i></button>
+                    </div>
+                    
+                    <div class="panel-body">
+                        <div class="detail-header-box">
+                            <div class="detail-icon-large"><i class="fa-solid fa-cart-shopping"></i></div>
+                            <div class="detail-info">
+                                <span class="badge-status status-succes" style="margin-bottom:5px;">Succès</span>
+                                <h2>Vente à crédit</h2>
+                                <div class="ref">V-2025-0525-047</div>
+                                <div class="date">25/05/2025 08:45:32</div>
+                            </div>
+                        </div>
+
+                        <div class="details-list">
+                            <div class="detail-row"><span class="detail-label">Type d'opération</span><span class="detail-value">Vente</span></div>
+                            <div class="detail-row"><span class="detail-label">Sous-type</span><span class="detail-value">Facture</span></div>
+                            <div class="detail-row"><span class="detail-label">Client</span><span class="detail-value">Awa Kossi</span></div>
+                            <div class="detail-row"><span class="detail-label">Montant total</span><span class="detail-value">1 200 000 FCFA</span></div>
+                            <div class="detail-row"><span class="detail-label">Montant payé</span><span class="detail-value">550 000 FCFA</span></div>
+                            <div class="detail-row"><span class="detail-label">Reste à payer</span><span class="detail-value text-danger">650 000 FCFA</span></div>
+                            <div class="detail-row"><span class="detail-label">Mode de paiement</span><span class="detail-value">Espèces (Partiel)</span></div>
+                            
+                            <div style="height: 10px;"></div> <!-- Spacer -->
+                            
+                            <div class="detail-row"><span class="detail-label">Utilisateur</span><span class="detail-value">Admin</span></div>
+                            <div class="detail-row"><span class="detail-label">Emplacement</span><span class="detail-value">Hall d'entrée</span></div>
+                            <div class="detail-row"><span class="detail-label">Résultat</span><span class="detail-value text-success" style="font-weight:500;">Succès</span></div>
+                            <div class="detail-row"><span class="detail-label">Source</span><span class="detail-value">Vente manuelle</span></div>
+                            <div class="detail-row"><span class="detail-label">Appareil</span><span class="detail-value">POST-01</span></div>
+                            <div class="detail-row"><span class="detail-label">Note</span><span class="detail-value">-</span></div>
+                        </div>
+
+                        <div class="section-title">Produits vendus (3)</div>
+                        <div class="product-list">
+                            <div class="product-item">
+                                <div class="product-item-left">
+                                    <img src="https://via.placeholder.com/24" class="product-img" alt="img">
+                                    <span>Ciment CFAO 42.5R (Sac)</span>
+                                </div>
+                                <span class="product-qty">10 sac(s)</span>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-item-left">
+                                    <img src="https://via.placeholder.com/24" class="product-img" alt="img">
+                                    <span>Fer à béton 12mm (Tige 12m)</span>
+                                </div>
+                                <span class="product-qty">5 pièce(s)</span>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-item-left">
+                                    <img src="https://via.placeholder.com/24" class="product-img" alt="img">
+                                    <span>Peinture Blanc 20L</span>
+                                </div>
+                                <span class="product-qty">2 pot(s)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-footer">
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <button class="btn btn-outline-primary" style="flex:1;"><i class="fa-solid fa-eye"></i> Voir le document</button>
+                            <button class="btn btn-outline-primary" style="flex:1;"><i class="fa-solid fa-print"></i> Imprimer</button>
+                        </div>
+                        <button class="btn btn-outline-danger"><i class="fa-solid fa-ban"></i> Annuler la vente</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ================= MOCK DATA =================
+        const mockHistory = [
+            { time: "25/05/2025 08:45:32", type: "Vente", typeClass: "op-vente", icon: "fa-cart-shopping", subtype: "Facture", desc: "Vente à crédit à Awa Kossi", ref: "V-2025-0525-047", user: "Admin", location: "Hall d'entrée", status: "Succès" },
+            { time: "25/05/2025 08:30:15", type: "Achat", typeClass: "op-achat", icon: "fa-bag-shopping", subtype: "Facture fournisseur", desc: "Achat chez SOCIMAT", ref: "A-2025-0525-026", user: "M. Traoré", location: "Entrepôt ciment", status: "Succès" },
+            { time: "25/05/2025 08:15:10", type: "Stock", typeClass: "op-stock", icon: "fa-arrow-down", subtype: "Entrée de stock", desc: "Réception de marchandises", ref: "E-2025-0525-015", user: "M. Koffi", location: "Magasin de stock", status: "Succès" },
+            { time: "25/05/2025 08:00:05", type: "Stock", typeClass: "op-stock", icon: "fa-arrow-up", subtype: "Sortie de stock", desc: "Sortie pour vente comptoir", ref: "S-2025-0525-089", user: "M. Adjoï", location: "Hall d'entrée", status: "Succès" },
+            { time: "25/05/2025 07:45:20", type: "Inventaire", typeClass: "op-inventaire", icon: "fa-clipboard-check", subtype: "Inventaire partiel", desc: "Inventaire Zone Carrelage", ref: "INV-2025-0525-003", user: "Admin", location: "Zone carrelage", status: "Succès" },
+            { time: "25/05/2025 07:30:11", type: "Modification", typeClass: "op-modif", icon: "fa-pen", subtype: "Produit", desc: "Modification du prix produit", ref: "P-2025-0525-012", user: "Admin", location: "-", status: "Succès" },
+            { time: "25/05/2025 07:20:45", type: "Vente", typeClass: "op-vente", icon: "fa-cart-shopping", subtype: "Facture", desc: "Vente comptoir à M. Koffi", ref: "V-2025-0525-046", user: "M. Adjoï", location: "Hall d'entrée", status: "Succès" },
+            { time: "25/05/2025 07:10:32", type: "Achat", typeClass: "op-achat", icon: "fa-bag-shopping", subtype: "Retour fournisseur", desc: "Retour partiel à CFAO Bénin", ref: "R-2025-0525-004", user: "M. Traoré", location: "Entrepôt ciment", status: "Succès" },
+            { time: "25/05/2025 07:05:18", type: "Stock", typeClass: "op-stock", icon: "fa-right-left", subtype: "Transfert", desc: "Transfert vers Entrepôt ciment", ref: "T-2025-0525-018", user: "M. Koffi", location: "Entrepôt ciment", status: "Succès" },
+            { time: "25/05/2025 06:58:02", type: "Connexion", typeClass: "op-connexion", icon: "fa-user", subtype: "Connexion", desc: "Connexion utilisateur", ref: "-", user: "M. Adjoï", location: "-", status: "Succès" }
+        ];
+
+        // ================= FONCTIONS =================
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+            
+            mockHistory.forEach(op => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color:var(--text-muted); font-size:11px;">${op.time}</td>
+                    <td>
+                        <div class="op-cell">
+                            <div class="op-icon ${op.typeClass}"><i class="fa-solid ${op.icon}"></i></div>
+                            <span class="badge-type ${op.typeClass}">${op.type}</span>
+                        </div>
+                    </td>
+                    <td>${op.subtype}</td>
+                    <td>${op.desc}</td>
+                    <td style="color:var(--text-muted); font-weight:500;">${op.ref}</td>
+                    <td>${op.user}</td>
+                    <td style="color:var(--text-muted);">${op.location}</td>
+                    <td><span class="badge-status status-succes"><i class="fa-solid fa-check-circle"></i> ${op.status}</span></td>
+                    <td style="text-align:right;">
+                        <button class="btn btn-outline" style="padding:4px 8px; font-size:10px; border:none;"><i class="fa-solid fa-eye" style="color:var(--text-muted);"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHistoryTable();
+        });
+    </script>
+</body>
+</html>

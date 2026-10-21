@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYOKA QUINCA - Clients</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================= VARIABLES & RESET ================= */
+        :root {
+            --bg-sidebar: #0b132b;
+            --bg-body: #f4f7f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #9333ea;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .logo-container { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 15px 10px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px; padding: 10px 15px;
+            color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 4px;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+        .corp { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+
+        /* ================= MAIN LAYOUT ================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .topbar {
+            background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .topbar-title h1 { font-size: 20px; font-weight: 600; }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .search-box {
+            display: flex; align-items: center; background: var(--bg-body); border: 1px solid var(--border-color);
+            padding: 8px 15px; border-radius: 6px; width: 280px; color: var(--text-muted);
+        }
+        .search-box input { border: none; background: transparent; outline: none; margin-left: 10px; width: 100%; font-size: 13px; }
+        
+        .btn { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+        .btn-outline { background: white; border-color: var(--border-color); color: var(--text-main); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline-primary { background: white; border-color: var(--primary); color: var(--primary); }
+        .btn-outline-danger { background: white; border-color: var(--danger); color: var(--danger); }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .user-info span { display: block; color: var(--text-muted); font-size: 11px; }
+        .notification { position: relative; cursor: pointer; font-size: 18px; margin-right: 15px; color: var(--text-muted); }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* ================= CONTENT AREA ================= */
+        .content-scroll {
+            flex: 1; overflow-y: auto; padding: 25px 30px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+        .kpi-card {
+            background: var(--bg-card); padding: 15px; border-radius: 10px;
+            border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .kpi-info h4 { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+        .kpi-value { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .kpi-trend { font-size: 10px; font-weight: 500; }
+        .kpi-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; flex-shrink: 0; }
+
+        /* Layout 2 Colonnes */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 15px; font-weight: 600; }
+
+        /* Filters Top */
+        .filters-row {
+            display: flex; gap: 10px; padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc; align-items: center; flex-wrap: wrap;
+        }
+        .filters-row select, .filters-row input {
+            padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; font-size: 12px; color: var(--text-main); background: white;
+        }
+        .btn-filter { background: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px;}
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 15px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px 15px; font-size: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; cursor: pointer; }
+        
+        .client-cell { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 600; font-size: 12px; }
+        .avatar-pink { background: #fce7f3; color: #db2777; }
+        .avatar-purple { background: #f3e8ff; color: #9333ea; }
+        .avatar-blue { background: #e0e7ff; color: #4f46e5; }
+        .avatar-orange { background: #ffedd5; color: #ea580c; }
+        .avatar-green { background: #dcfce7; color: #16a34a; }
+        .avatar-teal { background: #ccfbf1; color: #0d9488; }
+        .client-name { font-weight: 600; font-size: 12px; }
+        
+        /* Badges Groupes */
+        .badge-grp { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; }
+        .grp-particulier { background: #f3e8ff; color: #7e22ce; }
+        .grp-professionnel { background: #dcfce7; color: #15803d; }
+        .grp-entreprise { background: #ffedd5; color: #c2410c; }
+        
+        .badge-status { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; display: inline-block; }
+        .status-actif { background: #dcfce7; color: var(--success); }
+        
+        .solde-positif { color: var(--danger); font-weight: 600; }
+        .solde-zero { color: var(--text-main); font-weight: 500; }
+
+        /* Right Panel (Détails) */
+        .details-panel { display: flex; flex-direction: column; gap: 0; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); }
+        .panel-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        .client-profile { display: flex; gap: 15px; align-items: center; }
+        .client-profile .avatar-large { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: 700; background: #fce7f3; color: #db2777; }
+        .profile-info h3 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;}
+        .profile-info p { font-size: 12px; color: var(--text-muted); margin-top: 3px;}
+        
+        .panel-body { padding: 20px; }
+        
+        .contact-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; font-size: 12px; }
+        .contact-item { display: flex; gap: 10px; align-items: flex-start; }
+        .contact-item i { color: var(--text-muted); width: 16px; text-align: center; margin-top: 2px; }
+        .contact-item div { line-height: 1.4; }
+        
+        .info-grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .info-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; }
+        .info-box-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .info-box-title { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+        .info-box-icon { font-size: 16px; color: var(--primary); background: #eff6ff; padding: 4px; border-radius: 4px;}
+        .info-box-value { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+        .info-box-value.text-danger { color: var(--danger); }
+        .info-box-link { font-size: 10px; color: var(--primary); text-decoration: none; }
+
+        .activity-list { display: flex; flex-direction: column; gap: 10px; font-size: 12px; margin-bottom: 20px;}
+        .activity-row { display: flex; justify-content: space-between; }
+        .activity-label { color: var(--text-muted); }
+        .activity-value { font-weight: 500; text-align: right; }
+
+        /* Panel Footer */
+        .panel-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
+        .panel-footer .btn { justify-content: center; width: 100%;}
+
+        /* Quick Actions */
+        .quick-actions-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 15px; }
+        .action-btn {
+            background: #f8fafc; border: 1px solid var(--border-color); padding: 12px;
+            border-radius: 8px; display: flex; flex-direction: column; align-items: center; text-align: center;
+            gap: 5px; cursor: pointer; transition: 0.2s;
+        }
+        .action-btn:hover { border-color: var(--primary); background: #eff6ff; }
+        .action-btn i { font-size: 16px; margin-bottom: 3px; }
+        .action-btn span { font-size: 11px; font-weight: 500; }
+        .action-btn small { font-size: 9px; color: var(--text-muted); }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div style="background: white; padding: 5px; border-radius: 8px;"><i class="fa-solid fa-store" style="color: var(--primary); font-size: 24px;"></i></div>
+            <div><h2 style="font-size: 18px; letter-spacing: 1px;">AYOKA</h2><p style="font-size: 10px; color: #cbd5e1; letter-spacing: 2px;">QUINCA</p></div>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+            <a href="produits.html" class="nav-item"><i class="fa-solid fa-box"></i> Produits</a>
+            <a href="stock.html" class="nav-item"><i class="fa-solid fa-layer-group"></i> Stock</a>
+            <a href="ventes.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Ventes</a>
+            <a href="achats.html" class="nav-item"><i class="fa-solid fa-bag-shopping"></i> Achats</a>
+            <a href="inventaire.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+            <a href="fournisseurs.html" class="nav-item"><i class="fa-solid fa-users"></i> Fournisseurs</a>
+            <a href="clients.html" class="nav-item active"><i class="fa-solid fa-user"></i> Clients</a>
+            <a href="emplacements.html" class="nav-item"><i class="fa-solid fa-location-dot"></i> Emplacements</a>
+            <a href="historique.html" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+            <a href="rapports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Rapports & Statistiques</a>
+            <a href="utilisateurs.html" class="nav-item"><i class="fa-solid fa-user-shield"></i> Utilisateurs</a>
+            <a href="parametres.html" class="nav-item"><i class="fa-solid fa-gear"></i> Paramètres</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="corp">
+                <div style="background: var(--primary); padding: 8px; border-radius: 8px;"><i class="fa-solid fa-shield-halved"></i></div>
+                <div><p style="font-weight: 600;">MSM-CORP</p><p style="font-size: 11px; color: #cbd5e1;">Solutions digitales</p></div>
+            </div>
+            <div style="color: #cbd5e1; cursor: pointer;"><i class="fa-solid fa-angles-left"></i> Réduire le menu</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Clients</h1>
+                <p>Gérez vos clients et consultez l'historique de leurs achats et paiements.</p>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Rechercher un client...">
+                    <span style="font-size: 10px; background: white; padding: 2px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Ctrl + K</span>
+                </div>
+                <button class="btn btn-outline"><i class="fa-solid fa-file-export"></i> Exporter</button>
+                <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Ajouter un client <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                
+                <div class="notification"><i class="fa-regular fa-bell"></i><span class="badge">7</span></div>
+                <div class="user-profile">
+                    <div style="background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white;"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info"><strong>Admin</strong><span>Administrateur</span></div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 5px; cursor: pointer;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-scroll">
+            
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Total clients</h4>
+                        <div class="kpi-value">156</div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 8.3% ce mois</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #eff6ff; color: var(--primary);"><i class="fa-solid fa-users"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Clients actifs</h4>
+                        <div class="kpi-value text-success">98</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">62.8% du total</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #ecfdf5; color: var(--success);"><i class="fa-solid fa-check-circle"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Total ventes (Période)</h4>
+                        <div class="kpi-value">7 245 000 <span style="font-size:12px;">FCFA</span></div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 16.4% vs période préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #f3e8ff; color: var(--purple);"><i class="fa-solid fa-cart-shopping"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Montant total des crédits</h4>
+                        <div class="kpi-value text-warning">4 850 000 <span style="font-size:12px;">FCFA</span></div>
+                        <div class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> 7.2% vs période préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fffbeb; color: var(--warning);"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Montant restant à payer</h4>
+                        <div class="kpi-value text-danger">2 170 000 <span style="font-size:12px;">FCFA</span></div>
+                        <div class="kpi-trend text-danger"><i class="fa-solid fa-arrow-down"></i> 5.6% vs période préc.</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fef2f2; color: var(--danger);"><i class="fa-solid fa-money-bill-wave"></i></div>
+                </div>
+            </div>
+
+            <!-- MAIN LAYOUT -->
+            <div class="main-layout">
+                
+                <!-- COLONNE GAUCHE (Liste + Actions) -->
+                <div class="left-column">
+                    <div class="card">
+                        <div class="filters-row">
+                            <div class="search-box" style="width: 220px; padding: 8px 12px;">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" placeholder="Rechercher par nom, téléphone...">
+                                <span style="font-size: 10px; color:var(--text-muted);">Ctrl + K</span>
+                            </div>
+                            <select><option>Tous les statuts</option></select>
+                            <select><option>Tous les groupes</option></select>
+                            <select><option>Toutes les villes</option></select>
+                            <button class="btn-filter"><i class="fa-solid fa-filter"></i> Filtres avancés</button>
+                            <button class="btn-filter"><i class="fa-solid fa-rotate-right"></i> Réinitialiser</button>
+                        </div>
+
+                        <div class="card-header">
+                            <h3>Liste des clients (156)</h3>
+                            <button class="btn btn-outline" style="font-size:11px;"><i class="fa-solid fa-file-export"></i> Exporter <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></button>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Client <i class="fa-solid fa-sort" style="font-size:9px;"></i></th>
+                                        <th>Téléphone</th>
+                                        <th>Ville</th>
+                                        <th>Groupe</th>
+                                        <th>Total achats</th>
+                                        <th>Total payé</th>
+                                        <th>Reste à payer</th>
+                                        <th>Dernière visite</th>
+                                        <th>Statut</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clients-table-body">
+                                    <!-- Rempli par JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px; border-top: 1px solid var(--border-color); font-size: 12px;">
+                            <div>Afficher <select style="padding:2px 5px;"><option>10</option></select> par page</div>
+                            <div style="display:flex; gap:5px;">
+                                <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-left"></i></button>
+                                <button class="btn btn-primary" style="padding:4px 10px;">1</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">2</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">3</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">4</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">5</button>
+                                <span style="padding:0 5px;">...</span>
+                                <button class="btn btn-outline" style="padding:4px 10px;">16</button>
+                                <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-right"></i></button>
+                            </div>
+                            <div>Page 1 sur 16 (156)</div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Rapides -->
+                    <div class="card">
+                        <div class="card-header"><h3>Actions rapides</h3></div>
+                        <div class="quick-actions-grid">
+                            <div class="action-btn">
+                                <i class="fa-solid fa-user-plus" style="color: var(--primary);"></i>
+                                <span>Ajouter un client</span>
+                                <small>Créer un nouveau client</small>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fa-solid fa-money-bill-transfer" style="color: var(--success);"></i>
+                                <span>Enregistrer un paiement</span>
+                                <small>Paiement d'un client</small>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fa-solid fa-file-invoice" style="color: var(--warning);"></i>
+                                <span>Voir les crédits</span>
+                                <small>Clients avec crédits</small>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fa-solid fa-bell" style="color: var(--danger);"></i>
+                                <span>Envoyer un rappel</span>
+                                <small>Rappel de paiement</small>
+                            </div>
+                            <div class="action-btn">
+                                <i class="fa-solid fa-print" style="color: var(--purple);"></i>
+                                <span>Imprimer état de compte</span>
+                                <small>Imprimer l'état d'un client</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLONNE DROITE (Détails) -->
+                <div class="details-panel">
+                    <div class="panel-header">
+                        <h3>Détails du client</h3>
+                        <button class="btn btn-outline" style="padding: 5px 8px; border:none;"><i class="fa-solid fa-xmark" style="color:var(--text-muted);"></i></button>
+                    </div>
+                    
+                    <div class="panel-body">
+                        
+                        <div class="client-profile" style="margin-bottom: 20px;">
+                            <div class="avatar-large">AK</div>
+                            <div class="profile-info">
+                                <h3>Awa Kossi <span class="badge-status status-actif">Actif</span></h3>
+                                <p>Particulier depuis le 12/03/2023</p>
+                                <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Client ID : CLI-2023-00045</p>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="contact-list">
+                            <div class="contact-item">
+                                <i class="fa-solid fa-phone"></i>
+                                <div><strong>+229 97 12 45 67</strong></div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fa-solid fa-envelope"></i>
+                                <div><strong>awa.kossi@email.com</strong></div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <div><strong>Cotonou, Quartier Fidjrossè<br>Rue 12.345, Maison B-15</strong></div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fa-solid fa-users"></i>
+                                <div>Groupe : <strong style="color:var(--purple);">Particulier</strong></div>
+                            </div>
+                        </div>
+
+                        <!-- Grille 2x2 -->
+                        <div class="info-grid-2x2">
+                            <div class="info-box">
+                                <div class="info-box-header">
+                                    <div class="info-box-title">Total achats</div>
+                                    <i class="fa-solid fa-cart-shopping info-box-icon"></i>
+                                </div>
+                                <div class="info-box-value">1 850 000 <span style="font-size:10px;">FCFA</span></div>
+                                <a href="#" class="info-box-link">Voir l'historique</a>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-box-header">
+                                    <div class="info-box-title">Total payé</div>
+                                    <i class="fa-solid fa-check-circle info-box-icon" style="color:var(--success); background:#ecfdf5;"></i>
+                                </div>
+                                <div class="info-box-value" style="color:var(--success);">1 200 000 <span style="font-size:10px;">FCFA</span></div>
+                                <a href="#" class="info-box-link">Voir les paiements</a>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-box-header">
+                                    <div class="info-box-title">Reste à payer</div>
+                                    <i class="fa-solid fa-file-invoice info-box-icon" style="color:var(--danger); background:#fef2f2;"></i>
+                                </div>
+                                <div class="info-box-value text-danger">650 000 <span style="font-size:10px;">FCFA</span></div>
+                                <a href="#" class="info-box-link">Voir le crédit</a>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-box-header">
+                                    <div class="info-box-title">Nombre d'achats</div>
+                                    <i class="fa-solid fa-box-open info-box-icon" style="color:var(--purple); background:#f3e8ff;"></i>
+                                </div>
+                                <div class="info-box-value">8</div>
+                                <a href="#" class="info-box-link">Voir les ventes</a>
+                            </div>
+                        </div>
+
+                        <!-- Dernière activité -->
+                        <div class="activity-list">
+                            <h4 style="font-size:13px; margin-bottom:10px;">Dernière activité</h4>
+                            <div class="activity-row">
+                                <span class="activity-label">Dernière visite</span>
+                                <span class="activity-value">24/05/2025</span>
+                            </div>
+                            <div class="activity-row">
+                                <span class="activity-label">Dernière vente</span>
+                                <span class="activity-value">V-2025-0525-047</span>
+                            </div>
+                            <div class="activity-row">
+                                <span class="activity-label">Dernier paiement</span>
+                                <span class="activity-value">23/05/2025 (300 000 FCFA)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Footer -->
+                    <div class="panel-footer">
+                        <button class="btn btn-primary"><i class="fa-solid fa-cart-shopping"></i> Voir toutes les ventes</button>
+                        <button class="btn btn-outline-primary"><i class="fa-solid fa-print"></i> Imprimer l'état de compte</button>
+                        <button class="btn btn-outline-danger"><i class="fa-solid fa-user-slash"></i> Désactiver le client</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ================= MOCK DATA =================
+        const mockClients = [
+            { initials: "AK", avatarClass: "avatar-pink", name: "Awa Kossi", phone: "+229 97 12 45 67", city: "Cotonou", group: "Particulier", groupClass: "grp-particulier", totalBuy: "1 850 000 FCFA", totalPaid: "1 200 000 FCFA", balance: "650 000 FCFA", balanceClass: "solde-positif", lastVisit: "24/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "MK", avatarClass: "avatar-purple", name: "M. Koffi", phone: "+229 91 03 21 10", city: "Cotonou", group: "Professionnel", groupClass: "grp-professionnel", totalBuy: "2 450 000 FCFA", totalPaid: "1 800 000 FCFA", balance: "650 000 FCFA", balanceClass: "solde-positif", lastVisit: "23/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "BA", avatarClass: "avatar-green", name: "Bénin Ahouandjinou", phone: "+229 96 55 78 90", city: "Porto-Novo", group: "Professionnel", groupClass: "grp-professionnel", totalBuy: "980 000 FCFA", totalPaid: "980 000 FCFA", balance: "0 FCFA", balanceClass: "solde-zero", lastVisit: "21/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "SD", avatarClass: "avatar-orange", name: "Société Dossou", phone: "+229 95 12 33 44", city: "Abomey-Calavi", group: "Entreprise", groupClass: "grp-entreprise", totalBuy: "3 250 000 FCFA", totalPaid: "2 400 000 FCFA", balance: "850 000 FCFA", balanceClass: "solde-positif", lastVisit: "20/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "AC", avatarClass: "avatar-orange", name: "Adjoavi Constructions", phone: "+229 97 77 66 55", city: "Cotonou", group: "Entreprise", groupClass: "grp-entreprise", totalBuy: "1 650 000 FCFA", totalPaid: "1 650 000 FCFA", balance: "0 FCFA", balanceClass: "solde-zero", lastVisit: "19/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "TG", avatarClass: "avatar-purple", name: "Tchiboz Gérard", phone: "+229 94 66 22 11", city: "Parakou", group: "Particulier", groupClass: "grp-particulier", totalBuy: "720 000 FCFA", totalPaid: "320 000 FCFA", balance: "400 000 FCFA", balanceClass: "solde-positif", lastVisit: "18/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "YE", avatarClass: "avatar-teal", name: "Yéhouénou Émile", phone: "+229 96 44 55 33", city: "Cotonou", group: "Professionnel", groupClass: "grp-professionnel", totalBuy: "1 380 000 FCFA", totalPaid: "900 000 FCFA", balance: "480 000 FCFA", balanceClass: "solde-positif", lastVisit: "17/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "NT", avatarClass: "avatar-pink", name: "N'tcha Thomas", phone: "+229 61 23 45 67", city: "Ouidah", group: "Particulier", groupClass: "grp-particulier", totalBuy: "610 000 FCFA", totalPaid: "200 000 FCFA", balance: "410 000 FCFA", balanceClass: "solde-positif", lastVisit: "16/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "SA", avatarClass: "avatar-purple", name: "Savi Agbodjan", phone: "+229 97 00 11 22", city: "Cotonou", group: "Professionnel", groupClass: "grp-professionnel", totalBuy: "2 180 000 FCFA", totalPaid: "1 680 000 FCFA", balance: "500 000 FCFA", balanceClass: "solde-positif", lastVisit: "15/05/2025", status: "Actif", statusClass: "status-actif" },
+            { initials: "GS", avatarClass: "avatar-green", name: "Gandaho Sylvan", phone: "+229 95 21 43 00", city: "Porto-Novo", group: "Entreprise", groupClass: "grp-entreprise", totalBuy: "4 320 000 FCFA", totalPaid: "3 820 000 FCFA", balance: "500 000 FCFA", balanceClass: "solde-positif", lastVisit: "14/05/2025", status: "Actif", statusClass: "status-actif" }
+        ];
+
+        // ================= FONCTIONS =================
+
+        function renderClientsTable() {
+            const tbody = document.getElementById('clients-table-body');
+            tbody.innerHTML = '';
+            
+            mockClients.forEach(client => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="client-cell">
+                            <div class="avatar ${client.avatarClass}">${client.initials}</div>
+                            <div class="client-name">${client.name}</div>
+                        </div>
+                    </td>
+                    <td>${client.phone}</td>
+                    <td>${client.city}</td>
+                    <td><span class="badge-grp ${client.groupClass}">${client.group}</span></td>
+                    <td>${client.totalBuy}</td>
+                    <td>${client.totalPaid}</td>
+                    <td class="${client.balanceClass}">${client.balance}</td>
+                    <td>${client.lastVisit}</td>
+                    <td><span class="badge-status ${client.statusClass}">${client.status}</span></td>
+                    <td style="text-align:right;">
+                        <div style="display:flex; gap:5px; justify-content:flex-end;">
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:10px;"><i class="fa-solid fa-eye"></i></button>
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:10px;"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            renderClientsTable();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYOKA QUINCA - Inventaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================= VARIABLES & RESET ================= */
+        :root {
+            --bg-sidebar: #0b132b;
+            --bg-body: #f4f7f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #9333ea;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .logo-container { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 15px 10px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px; padding: 10px 15px;
+            color: #cbd5e1; text-decoration: none; border-radius: 8px; margin-bottom: 4px;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+        .corp { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+
+        /* ================= MAIN LAYOUT ================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .topbar {
+            background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .topbar-title h1 { font-size: 20px; font-weight: 600; }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        
+        .btn { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+        .btn-outline { background: white; border-color: var(--border-color); color: var(--text-main); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline-primary { background: white; border-color: var(--primary); color: var(--primary); }
+        .btn-outline-danger { background: white; border-color: var(--danger); color: var(--danger); }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .user-info span { display: block; color: var(--text-muted); font-size: 11px; }
+        .notification { position: relative; cursor: pointer; font-size: 18px; margin-right: 15px; color: var(--text-muted); }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* ================= CONTENT AREA ================= */
+        .content-scroll {
+            flex: 1; overflow-y: auto; padding: 25px 30px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+        .kpi-card {
+            background: var(--bg-card); padding: 15px; border-radius: 10px;
+            border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .kpi-info h4 { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+        .kpi-value { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .kpi-trend { font-size: 10px; font-weight: 500; }
+        .kpi-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; flex-shrink: 0; }
+
+        /* Layout 2 Colonnes */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; }
+        .card-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 15px; font-weight: 600; }
+
+        /* Tabs Horizontal */
+        .h-tabs { display: flex; border-bottom: 1px solid var(--border-color); padding: 0 20px; background: white;}
+        .h-tab { padding: 15px 15px; font-size: 13px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500;}
+        .h-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* Filters Top */
+        .filters-row {
+            display: flex; gap: 10px; padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc; align-items: center; flex-wrap: wrap;
+        }
+        .search-box {
+            display: flex; align-items: center; background: white; border: 1px solid var(--border-color);
+            padding: 6px 12px; border-radius: 6px; width: 200px; color: var(--text-muted);
+        }
+        .search-box input { border: none; background: transparent; outline: none; margin-left: 8px; width: 100%; font-size: 12px; }
+        .filters-row select {
+            padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; font-size: 12px; color: var(--text-main); background: white;
+        }
+        .btn-filter { background: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px;}
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 15px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        td { padding: 10px 15px; font-size: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; }
+        
+        .product-cell { display: flex; align-items: center; gap: 10px; }
+        .product-img { width: 30px; height: 30px; background: #e2e8f0; border-radius: 4px; }
+        .product-name { font-weight: 600; font-size: 12px;}
+        .product-ref { font-size: 10px; color: var(--text-muted); }
+        
+        /* Table Inputs */
+        .input-stock {
+            width: 70px; padding: 6px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12px; text-align: center; outline: none;
+        }
+        .input-stock:focus { border-color: var(--primary); }
+        .unit-text { font-size: 10px; color: var(--text-muted); margin-left: 5px; }
+
+        /* Badges */
+        .badge-status { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; display: inline-block; }
+        .status-conforme { background: #dcfce7; color: var(--success); }
+        .status-ecart { background: #fee2e2; color: var(--danger); }
+        .status-ecart-plus { background: #dcfce7; color: var(--success); } /* Vert pour écart positif */
+        
+        .text-danger { color: var(--danger); font-weight: 600; }
+        .text-success { color: var(--success); font-weight: 600; }
+
+        /* Right Panel (Détails) */
+        .details-panel { display: flex; flex-direction: column; gap: 20px; }
+        .panel-card { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); padding: 20px;}
+        
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .panel-header h3 { font-size: 15px; font-weight: 600; }
+        
+        .info-list { display: flex; flex-direction: column; gap: 12px; font-size: 12px; margin-bottom: 20px;}
+        .info-row { display: flex; justify-content: space-between; align-items: center; }
+        .info-label { color: var(--text-muted); }
+        .info-value { font-weight: 500; }
+        
+        /* Progress Bar */
+        .progress-container { margin-bottom: 20px; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--primary); width: 62%; border-radius: 4px; }
+
+        /* Panel Actions */
+        .panel-actions { display: flex; flex-direction: column; gap: 10px; }
+        .panel-actions .btn { justify-content: center; padding: 10px; font-size: 13px; }
+
+        /* Résumé des écarts */
+        .summary-list { display: flex; flex-direction: column; gap: 12px; font-size: 12px; margin-bottom: 20px;}
+        .summary-row { display: flex; justify-content: space-between; align-items: center; }
+        .summary-label { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-success { background: var(--success); }
+        .dot-warning { background: var(--warning); }
+        .dot-danger { background: var(--danger); }
+        .summary-val { font-weight: 600; }
+        .summary-val.danger { color: var(--danger); }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div style="background: white; padding: 5px; border-radius: 8px;"><i class="fa-solid fa-store" style="color: var(--primary); font-size: 24px;"></i></div>
+            <div><h2 style="font-size: 18px; letter-spacing: 1px;">AYOKA</h2><p style="font-size: 10px; color: #cbd5e1; letter-spacing: 2px;">QUINCA</p></div>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+            <a href="produits.html" class="nav-item"><i class="fa-solid fa-box"></i> Produits</a>
+            <a href="stock.html" class="nav-item"><i class="fa-solid fa-layer-group"></i> Stock</a>
+            <a href="ventes.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Ventes</a>
+            <a href="achats.html" class="nav-item"><i class="fa-solid fa-bag-shopping"></i> Achats</a>
+            <a href="inventaire.html" class="nav-item active"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+            <a href="fournisseurs.html" class="nav-item"><i class="fa-solid fa-users"></i> Fournisseurs</a>
+            <a href="clients.html" class="nav-item"><i class="fa-solid fa-user"></i> Clients</a>
+            <a href="emplacements.html" class="nav-item"><i class="fa-solid fa-location-dot"></i> Emplacements</a>
+            <a href="historique.html" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+            <a href="rapports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Rapports & Statistiques</a>
+            <a href="utilisateurs.html" class="nav-item"><i class="fa-solid fa-user-shield"></i> Utilisateurs</a>
+            <a href="parametres.html" class="nav-item"><i class="fa-solid fa-gear"></i> Paramètres</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="corp">
+                <div style="background: var(--primary); padding: 8px; border-radius: 8px;"><i class="fa-solid fa-shield-halved"></i></div>
+                <div><p style="font-weight: 600;">MSM-CORP</p><p style="font-size: 11px; color: #cbd5e1;">Solutions digitales</p></div>
+            </div>
+            <div style="color: #cbd5e1; cursor: pointer;"><i class="fa-solid fa-angles-left"></i> Réduire le menu</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Inventaire</h1>
+                <p>Vérifiez et ajustez vos stocks physiques.</p>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn btn-outline"><i class="fa-regular fa-calendar"></i> Inventaire du 25/05/2025 <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                <button class="btn btn-outline"><i class="fa-solid fa-rotate-right"></i> Actualiser</button>
+                <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nouvel inventaire <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></button>
+                
+                <div class="notification"><i class="fa-regular fa-bell"></i><span class="badge">7</span></div>
+                <div class="user-profile">
+                    <div style="background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white;"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info"><strong>Admin</strong><span>Administrateur</span></div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 5px; cursor: pointer;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-scroll">
+            
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Statut de l'inventaire</h4>
+                        <div class="kpi-value text-warning">En cours</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">Démarré le 25/05/2025 à 08:30</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fffbeb; color: var(--warning);"><i class="fa-solid fa-clock"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Produits comptés</h4>
+                        <div class="kpi-value">158</div>
+                        <div class="kpi-trend" style="color:var(--text-muted);">sur 256 produits</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #eff6ff; color: var(--primary);"><i class="fa-solid fa-clipboard-check"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Valeur théorique</h4>
+                        <div class="kpi-value">38 450 000 <span style="font-size:12px;">FCFA</span></div>
+                    </div>
+                    <div class="kpi-icon" style="background: #f3e8ff; color: var(--purple);"><i class="fa-solid fa-calculator"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Valeur réelle</h4>
+                        <div class="kpi-value text-success">38 120 000 <span style="font-size:12px;">FCFA</span></div>
+                    </div>
+                    <div class="kpi-icon" style="background: #ecfdf5; color: var(--success);"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <h4>Écart total</h4>
+                        <div class="kpi-value text-danger">-330 000 <span style="font-size:12px;">FCFA</span></div>
+                        <div class="kpi-trend text-danger">-0.86 %</div>
+                    </div>
+                    <div class="kpi-icon" style="background: #fef2f2; color: var(--danger);"><i class="fa-solid fa-chart-line-down"></i></div>
+                </div>
+            </div>
+
+            <!-- MAIN LAYOUT -->
+            <div class="main-layout">
+                
+                <!-- COLONNE GAUCHE (Liste) -->
+                <div class="left-column">
+                    <div class="card">
+                        <div class="h-tabs">
+                            <div class="h-tab active">Comptage</div>
+                            <div class="h-tab">Rapport d'écarts</div>
+                        </div>
+
+                        <div class="filters-row">
+                            <select><option>Entrepôt ciment</option></select>
+                            <select><option>Toutes les zones</option></select>
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" placeholder="Rechercher un produit...">
+                            </div>
+                            <select><option>Toutes les catégories</option></select>
+                            <select><option>Tous les statuts</option></select>
+                            <button class="btn-filter" style="margin-left:auto;"><i class="fa-solid fa-rotate-right"></i> Réinitialiser</button>
+                        </div>
+
+                        <div class="card-header" style="border-top: 1px solid var(--border-color);">
+                            <h3>Liste de comptage (158)</h3>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-outline-primary" style="font-size:12px;"><i class="fa-solid fa-barcode"></i> Scanner</button>
+                                <button class="btn btn-outline" style="font-size:12px;">Actions <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Produit <i class="fa-solid fa-sort" style="font-size:9px;"></i></th>
+                                        <th>Emplacement / Zone</th>
+                                        <th>Stock théorique</th>
+                                        <th>Stock réel</th>
+                                        <th>Écart</th>
+                                        <th>Écart (%)</th>
+                                        <th>Statut</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-table-body">
+                                    <!-- Rempli par JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px; border-top: 1px solid var(--border-color); font-size: 12px;">
+                            <div>Afficher <select style="padding:2px 5px;"><option>10</option></select> par page</div>
+                            <div style="display:flex; gap:5px;">
+                                <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-left"></i></button>
+                                <button class="btn btn-primary" style="padding:4px 10px;">1</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">2</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">3</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">4</button>
+                                <button class="btn btn-outline" style="padding:4px 10px;">5</button>
+                                <span style="padding:0 5px;">...</span>
+                                <button class="btn btn-outline" style="padding:4px 10px;">16</button>
+                                <button class="btn btn-outline" style="padding:4px 8px;"><i class="fa-solid fa-angle-right"></i></button>
+                            </div>
+                            <div>Page 1 sur 16</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLONNE DROITE (Détails + Résumé) -->
+                <div class="details-panel">
+                    
+                    <!-- Détails Inventaire -->
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h3>Détails de l'inventaire</h3>
+                            <button class="btn btn-outline" style="padding: 5px 8px; border:none;"><i class="fa-solid fa-xmark" style="color:var(--text-muted);"></i></button>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h4 style="font-size:14px;">Inventaire du 25/05/2025</h4>
+                            <span class="badge-status status-partiel">En cours</span>
+                        </div>
+
+                        <div class="info-list">
+                            <div class="info-row"><span class="info-label">Démarré le</span><span class="info-value">25/05/2025 à 08:30</span></div>
+                            <div class="info-row"><span class="info-label">Responsable</span><span class="info-value">Admin</span></div>
+                            <div class="info-row"><span class="info-label">Emplacement</span><span class="info-value">Entrepôt ciment</span></div>
+                            <div class="info-row"><span class="info-label">Zone actuelle</span><span class="info-value">Rang 1 - Palette A</span></div>
+                        </div>
+
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Progression</span>
+                                <span>62% (158 / 256)</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="panel-actions">
+                            <button class="btn btn-primary" style="background:var(--primary);"><i class="fa-solid fa-check"></i> Valider l'inventaire</button>
+                            <button class="btn btn-outline-primary"><i class="fa-solid fa-pause"></i> Mettre en pause</button>
+                            <button class="btn btn-outline-danger"><i class="fa-solid fa-trash"></i> Annuler l'inventaire</button>
+                        </div>
+                    </div>
+
+                    <!-- Résumé des écarts -->
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h3>Résumé des écarts</h3>
+                        </div>
+                        
+                        <div class="summary-list">
+                            <div class="summary-row">
+                                <div class="summary-label"><div class="dot dot-success"></div> Produits conformes</div>
+                                <div class="summary-val">102 (64,56 %)</div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-label"><div class="dot dot-success" style="background:#10b981;"></div> Écarts positifs</div>
+                                <div class="summary-val" style="color:var(--success);">18 (11,39 %)</div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-label"><div class="dot dot-danger"></div> Écarts négatifs</div>
+                                <div class="summary-val danger">38 (24,05 %)</div>
+                            </div>
+                        </div>
+
+                        <div style="border-top:1px solid var(--border-color); padding-top:15px; margin-bottom:15px;">
+                            <div class="summary-row">
+                                <div class="summary-label">Écart total (quantité)</div>
+                                <div class="summary-val danger">-142</div>
+                            </div>
+                            <div class="summary-row" style="margin-top:10px;">
+                                <div class="summary-label">Écart total (valeur)</div>
+                                <div class="summary-val danger">-330 000 FCFA</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-outline-primary" style="width: 100%; justify-content: center; font-size: 12px;">Voir le rapport d'écarts <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ================= MOCK DATA =================
+        const mockInventory = [
+            { id: 1, name: "Ciment CFAO 42.5R (Sac)", ref: "PROD-0001", loc: "Entrepôt ciment<br><small>Rang 1 - Palette A</small>", theoretical: "125 sac(s)", real: "123", unit: "sac(s)", gap: "-2 sac(s)", gapClass: "text-danger", gapPercent: "-1,60 %", status: "Écart", statusClass: "status-ecart" },
+            { id: 2, name: "Fer à béton 12mm (Tige 12m)", ref: "PROD-0002", loc: "Entrepôt ciment<br><small>Zone A - Ét. 2</small>", theoretical: "230 pièce(s)", real: "230", unit: "pièce(s)", gap: "0", gapClass: "", gapPercent: "0,00 %", status: "Conforme", statusClass: "status-conforme" },
+            { id: 3, name: "Peinture Blanc 20L", ref: "PROD-0003", loc: "Entrepôt ciment<br><small>Zone B - Ét. 1</small>", theoretical: "45 pot(s)", real: "43", unit: "pot(s)", gap: "-2 pot(s)", gapClass: "text-danger", gapPercent: "-4,44 %", status: "Écart", statusClass: "status-ecart" },
+            { id: 4, name: "Tube PVC 4m (32mm)", ref: "PROD-0004", loc: "Entrepôt ciment<br><small>Zone C - Ét. 3</small>", theoretical: "80 pièce(s)", real: "80", unit: "pièce(s)", gap: "0", gapClass: "", gapPercent: "0,00 %", status: "Conforme", statusClass: "status-conforme" },
+            { id: 5, name: "Colle carrelage 25kg", ref: "PROD-0005", loc: "Entrepôt ciment<br><small>Rang 2 - Palette B</small>", theoretical: "32 sac(s)", real: "35", unit: "sac(s)", gap: "+3 sac(s)", gapClass: "text-success", gapPercent: "+9,38 %", status: "Écart +", statusClass: "status-ecart-plus" },
+            { id: 6, name: "Gravier 10mm", ref: "PROD-0006", loc: "Entrepôt matériaux<br><small>Rang 3 - Tas 1</small>", theoretical: "6 m³", real: "5,8", unit: "m³", gap: "-0,2 m³", gapClass: "text-danger", gapPercent: "-3,33 %", status: "Écart", statusClass: "status-ecart" },
+            { id: 7, name: "Robinet PVC 1/2\"", ref: "PROD-0007", loc: "Entrepôt ciment<br><small>Zone C - Ét. 1</small>", theoretical: "60 pièce(s)", real: "60", unit: "pièce(s)", gap: "0", gapClass: "", gapPercent: "0,00 %", status: "Conforme", statusClass: "status-conforme" },
+            { id: 8, name: "Planche 3m", ref: "PROD-0008", loc: "Entrepôt ciment<br><small>Zone D - Ét. 2</small>", theoretical: "25 pièce(s)", real: "24", unit: "pièce(s)", gap: "-1 pièce(s)", gapClass: "text-danger", gapPercent: "-4,00 %", status: "Écart", statusClass: "status-ecart" },
+            { id: 9, name: "Clou 4\" (Boîte)", ref: "PROD-0009", loc: "Entrepôt matériaux<br><small>Étagère 1</small>", theoretical: "15 boîte(s)", real: "15", unit: "boîte(s)", gap: "0", gapClass: "", gapPercent: "0,00 %", status: "Conforme", statusClass: "status-conforme" },
+            { id: 10, name: "Fil électrique 2.5mm (100m)", ref: "PROD-0010", loc: "Entrepôt matériaux<br><small>Étagère 2</small>", theoretical: "20 rouleau(x)", real: "18", unit: "rouleau(x)", gap: "-2 rouleau(x)", gapClass: "text-danger", gapPercent: "-10,00 %", status: "Écart", statusClass: "status-ecart" }
+        ];
+
+        // ================= FONCTIONS =================
+
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-table-body');
+            tbody.innerHTML = '';
+            
+            mockInventory.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color:var(--text-muted);">${item.id}</td>
+                    <td>
+                        <div class="product-cell">
+                            <img src="https://via.placeholder.com/30" class="product-img" alt="img">
+                            <div><div class="product-name">${item.name}</div><div class="product-ref">${item.ref}</div></div>
+                        </div>
+                    </td>
+                    <td style="font-size: 11px; line-height:1.3;">${item.loc}</td>
+                    <td style="color:var(--text-muted);">${item.theoretical}</td>
+                    <td>
+                        <div style="display:flex; align-items:center;">
+                            <input type="text" class="input-stock" value="${item.real}">
+                            <span class="unit-text">${item.unit}</span>
+                        </div>
+                    </td>
+                    <td class="${item.gapClass}">${item.gap}</td>
+                    <td class="${item.gapClass}">${item.gapPercent}</td>
+                    <td><span class="badge-status ${item.statusClass}">${item.status}</span></td>
+                    <td style="text-align:right;">
+                        <div style="display:flex; gap:5px; justify-content:flex-end;">
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:10px;"><i class="fa-solid fa-rotate-right"></i></button>
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:10px;"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            renderInventoryTable();
+        });
+    </script>
+</body>
+</html>
